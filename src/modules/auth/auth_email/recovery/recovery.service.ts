@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/schema/users/user.entity';
-import { EmailService } from '../email/email.service';
-import { JwtService } from '../jwt/jwt.service';
+import { EmailService } from '../../common/email/email.service';
+import { JwtService } from '../../common/jwt/jwt.service';
 
 @Injectable()
 class RecoveryService {

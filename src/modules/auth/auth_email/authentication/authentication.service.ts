@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/schema/users/user.entity';
-import { JwtService } from '../jwt/jwt.service';
+import { JwtService } from '../../common/jwt/jwt.service';
 import { Request } from 'express';
 import * as useragent from 'express-useragent';
 import * as bcrypt from 'bcrypt';

@@ -9,8 +9,8 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/schema/users/user.entity';
-import { JwtService } from '../jwt/jwt.service';
-import { EmailService } from '../email/email.service';
+import { JwtService } from '../../common/jwt/jwt.service';
+import { EmailService } from '../../common/email/email.service';
 import * as useragent from 'express-useragent';
 import { ActivateAccountDtoReq, CreateAccountDtoReq, CreateAccountDtoRes } from './dto';
 
