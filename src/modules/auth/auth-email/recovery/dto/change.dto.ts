@@ -7,3 +7,8 @@ export class ChangeDtoReq {
   @IsNotEmpty()
   public password: string;
 }
+
+export class ChangeDtoRes {
+  accessToken: string;
+  refreshToken: string;
+}

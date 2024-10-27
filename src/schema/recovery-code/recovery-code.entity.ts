@@ -6,7 +6,7 @@ import { User } from '../users/user.entity';
 export class RecoveryCode extends BaseEntity {
 
   @Column()
-  code: number;
+  code: string;
 
   @OneToOne(() => User, (user) => user.recoveryCode)
   @JoinColumn({ name: 'user_id' })

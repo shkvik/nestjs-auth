@@ -28,6 +28,7 @@ export class RegistrationService {
 
   public async createAccount(dto: CreateDtoReq): Promise<CreateDtoRes> {
     const isUserExists = await this.usersRepository.findOne({
+      select: { id: true },
       where: [{ email: dto.email }],
     });
     if (isUserExists) {
@@ -50,6 +51,7 @@ export class RegistrationService {
 
   public async activateAccount(dto: ActivateDtoReq): Promise<string> {
     const user = await this.usersRepository.findOne({
+      select: { id: true, is_active: true },
       where: { activation_link: dto.activationLink },
     });
     if (!user || user.is_active) {
