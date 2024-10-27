@@ -58,4 +58,8 @@ export class ConfigEmail {
   @IsString()
   @IsNotEmpty()
   REDIRECT_URL: string;
+
+  @IsString()
+  @IsNotEmpty()
+  CONFIRM_EMAIL_URL: string;
 }

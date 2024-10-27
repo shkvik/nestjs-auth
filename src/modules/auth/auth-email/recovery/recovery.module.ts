@@ -7,15 +7,8 @@ import { JwtModule } from '../../common/jwt/jwt.module';
 import { EmailModule } from '../services/email/email.module';
 
 @Module({
-  imports: [
-    UsersDBModule,
-    EmailModule
-  ],
-  controllers: [
-    RecoveryController
-  ],
-  providers: [
-    RecoveryService
-  ],
+  imports: [UsersDBModule, EmailModule],
+  controllers: [RecoveryController],
+  providers: [RecoveryService],
 })
 export class RecoveryModule { }

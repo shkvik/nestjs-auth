@@ -26,7 +26,7 @@ export class EmailService {
     await this.Transporter.sendMail({
       from: tmp_email,
       to: options.to,
-      subject: 'Account activation ringfence',
+      subject: 'Account activation link',
       html: `
 			<div> 
 				<h1>For activation go to link</h1>
@@ -36,15 +36,14 @@ export class EmailService {
     });
   }
 
-  public async SendRecoveryMail(options: { to: string; link: string }): Promise<void> {
+  public async sendRecoveryCode(options: { to: string; code: string }): Promise<void> {
     await this.Transporter.sendMail({
       from: tmp_email,
       to: options.to,
-      subject: 'Recovery password ringfence',
+      subject: 'Recovery password code',
       html: `
 			<div> 
-				<h1>For recovery password go to link</h1>
-				<a href="${options.link}">${options.link}</a>
+				<h1>${options.code}</h1>
 			</div> 
 			`,
     });

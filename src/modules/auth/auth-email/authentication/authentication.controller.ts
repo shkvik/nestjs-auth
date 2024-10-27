@@ -29,7 +29,7 @@ export class AuthenticationController {
     await this.authenticationService.logout(jwt);
   }
 
-  @Get('refresh')
+  @Get('refresh-token')
   @ApiBearerAuth()
   @UseGuards(new BaseGuard(CONFIG_AUTH.JWT_REFRESH))
   public async refresh(@Jwt() jwt: JwtAuthPayload): Promise<RefreshDtoRes> {
