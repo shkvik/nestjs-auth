@@ -1,10 +1,6 @@
 export interface JwtAuthPayload {
   userId: number;
-  ip: string;
-  browser: string;
-  platform: string;
-  os: string;
-  device?: string;
+  sessionId: string;
 }
 
 export interface JwtPair {

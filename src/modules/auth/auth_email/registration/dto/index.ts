@@ -1,2 +1,2 @@
-export * from './create-account.dto';
-export * from './activate-account.dto';
+export * from './create.dto';
+export * from './activate.dto';

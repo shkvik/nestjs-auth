@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, IsStrongPassword } from 'class-validator';
-import { JwtPair } from '../../../common/jwt/interface/jwt.interface';
+import { IsStrongPassword, IsEmail } from 'class-validator';
 
-export class LoginDtoReq {
+export class CreateDtoReq {
   @ApiProperty({
     description: 'Email address of the user',
     example: 'example@email.com',
@@ -11,8 +10,8 @@ export class LoginDtoReq {
   public email: string;
 
   @ApiProperty({ description: 'User password' })
-  @IsString()
+  @IsStrongPassword({ minLength: 8, minUppercase: 1 })
   public password: string;
 }
 
-export interface LoginDtoRes extends JwtPair {}
+export type CreateDtoRes = boolean;

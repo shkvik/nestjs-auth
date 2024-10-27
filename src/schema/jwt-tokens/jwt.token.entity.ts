@@ -10,17 +10,8 @@ export class JwtToken extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ comment: 'ip address' })
-  ip: string;
-
-  @Column({ comment: 'browser' })
-  browser: string;
-
-  @Column({ comment: 'platform' })
-  platform: string;
-
-  @Column({ comment: 'os' })
-  os: string;
+  @Column({ comment: 'Session id uuid' })
+  session_id: string;
 
   @Column({ comment: 'Refresh token' })
   refresh_token: string;

@@ -1,30 +1,38 @@
-import { Body, Controller, Get, Req, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { LoginDtoReq, LoginDtoRes } from './dto/login.dto';
-import { Request } from 'express';
+import { BaseGuard } from 'src/guards/base.guard';
+import { CONFIG_AUTH } from 'src/config/config.export';
+import { Jwt } from '../../common/jwt/jwt.decorator';
+import { JwtAuthPayload } from '../../common/jwt/interface/jwt.interface';
+import { RefreshDtoRes } from './dto/refresh.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthenticationController {
-  constructor(private readonly authenticationService: AuthenticationService) {}
+  constructor(private readonly authenticationService: AuthenticationService) { }
 
-  @Get('login')
+  @Post('login')
+  @ApiBody({ type: LoginDtoReq })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
-  @ApiBody({ type: LoginDtoReq })
-  public async login(@Body() dto: LoginDtoReq, @Req() req: Request): Promise<LoginDtoRes> {
-    return this.authenticationService.login({ ...dto, req });
+  public async login(@Body() dto: LoginDtoReq): Promise<LoginDtoRes> {
+    return this.authenticationService.login(dto);
   }
 
   @Get('logout')
-  public async logout(request: string): Promise<string> {
-    return this.authenticationService.logout(request);
+  @ApiBearerAuth()
+  @UseGuards(new BaseGuard(CONFIG_AUTH.JWT_ACCESS))
+  public async logout(@Jwt() jwt: JwtAuthPayload): Promise<void> {
+    await this.authenticationService.logout(jwt);
   }
 
-  @Get('refresh-token')
-  public async refreshToken(request: string): Promise<string> {
-    return this.authenticationService.refreshToken(request);
+  @Get('refresh')
+  @ApiBearerAuth()
+  @UseGuards(new BaseGuard(CONFIG_AUTH.JWT_REFRESH))
+  public async refresh(@Jwt() jwt: JwtAuthPayload): Promise<RefreshDtoRes> {
+    return this.authenticationService.refresh(jwt);
   }
 }

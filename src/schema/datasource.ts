@@ -18,7 +18,7 @@ export const dataSourceUserOption: DataSourceOptions = {
   migrationsTableName: 'migrations',
   migrations: [join(__dirname, 'migrations/migration-files/**.ts')],
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
-  synchronize: false,
+  synchronize: true,
   //ssl: tlsOptions,
-  logging: false,
+  logging: true,
 };

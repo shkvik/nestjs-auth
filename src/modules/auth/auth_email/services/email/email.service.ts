@@ -6,7 +6,7 @@ const tmp_email = 'tmp_email';
 const tmp_password = 'tmp_password';
 
 @Injectable()
-class EmailService {
+export class EmailService {
   public readonly Transporter: Transporter<SMTPTransport.SentMessageInfo>;
 
   constructor() {
@@ -50,4 +50,3 @@ class EmailService {
     });
   }
 }
-export { EmailService };

@@ -1,19 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/schema/users/user.entity';
-import { EmailService } from '../../common/email/email.service';
+import { EmailService } from '../services/email/email.service';
 import { JwtService } from '../../common/jwt/jwt.service';
 
 @Injectable()
-class RecoveryService {
-  constructor(
-    @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
-    private readonly emailService: EmailService,
-    private readonly jwtService: JwtService,
-  ) {}
+export class RecoveryService {
 
+  @InjectRepository(User)
+  private readonly usersRepository: Repository<User>;
+
+  @Inject()
+  private readonly jwtService: JwtService;
+
+  constructor(private readonly emailService: EmailService) {}
+    
   public async sendEmail(dto: string): Promise<string> {
     return '';
   }
@@ -28,5 +30,3 @@ class RecoveryService {
 
   private isUserExistAndActivated(user: User): void {}
 }
-
-export { RecoveryService };
