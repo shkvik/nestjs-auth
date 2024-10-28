@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail } from 'class-validator';
+import { Allow, IsEmail } from 'class-validator';
 
 export class SendDtoReq {
   @ApiProperty({ 
@@ -11,5 +11,6 @@ export class SendDtoReq {
 }
 
 export class SendDtoRes {
+  @Allow()
   result: boolean;
 }

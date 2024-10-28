@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { Allow, IsNotEmpty, IsString } from 'class-validator';
 
 export class ConfirmDtoReq {
   @ApiProperty()
@@ -9,5 +9,6 @@ export class ConfirmDtoReq {
 }
 
 export class ConfirmDtoRes {
+  @Allow()
   recoveryToken: string;
 }

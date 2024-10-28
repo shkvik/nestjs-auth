@@ -29,8 +29,13 @@ export class RecoveryService {
   private readonly emailService: EmailService;
 
   public async sendCode(dto: SendDtoReq): Promise<SendDtoRes> {
-    const user = await this.usersRepository.findOneBy({ email: dto.email });
-    if (!user) {
+    const user = await this.usersRepository.findOne({ 
+      relationLoadStrategy: 'join',
+      relations: { recoveryCode: true },
+      select: { id: true, recoveryCode: { id: true} },
+      where: { email: dto.email }
+    });
+    if (!user || user.recoveryCode ) {
       throw new BadRequestException();
     }
     const code = this.getCryptoCode(6);

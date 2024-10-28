@@ -17,6 +17,8 @@ import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { RefreshDtoRes } from 'src/modules/auth/auth-email/authentication/dto/refresh.dto';
 import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
+import { SendDtoReq, SendDtoRes } from 'src/modules/auth/auth-email/recovery/dto/send.dto';
+import { ConfirmDtoReq, ConfirmDtoRes } from 'src/modules/auth/auth-email/recovery/dto/confirm.dto';
 
 
 export function validateObj<T extends object>(params: {
@@ -41,7 +43,7 @@ export function validateObj<T extends object>(params: {
 describe('Tests (e2e)', () => {
   const mockEmailService = {
     sendActivationMail: jest.fn(),
-    sendRecoveryMail: jest.fn(),
+    sendRecoveryCode: jest.fn(),
   };
 
   let app: INestApplication;
@@ -60,6 +62,7 @@ describe('Tests (e2e)', () => {
 
     usersRepository = transactionRunner.manager.getRepository(User);
     jwtRepository = transactionRunner.manager.getRepository(JwtToken);
+    recoveryCodeRepository = transactionRunner.manager.getRepository(RecoveryCode);
 
     const moduleFixture: TestingModule = await Test
       .createTestingModule({ imports: [AppModule] })
@@ -188,20 +191,14 @@ describe('Tests (e2e)', () => {
       expect(res.body).toEqual({});
     }
   });
-  
+
   it('Recovery', async () => {
     const size = 2;
-    const userInputs = new Map<string, string>();
-    const userTokens = new Map<number, JwtPair>();
-
     const fakeUsers = Array.from({ length: size }, async () => {
-
-      const password = faker.internet.password({ length: 16 });
+      const hashPassword = await hash(
+        faker.internet.password({ length: 16 }), 3
+      );
       const email = faker.internet.email();
-
-      userInputs.set(email, password);
-
-      const hashPassword = await hash(password, 3);
 
       return usersRepository.create({
         email: email,
@@ -211,10 +208,44 @@ describe('Tests (e2e)', () => {
     });
     const createdUsers = await Promise.all(fakeUsers);
     const savedUsers = await usersRepository.save(createdUsers);
-    for () {
-      
-    }
+    const userIds = new Set();
+    for (const user of savedUsers) {
+      const dto: SendDtoReq = {
+        email: user.email
+      };
+      userIds.add(user.id);
+      const req = request(app.getHttpServer()).post('/auth/send-code')
 
+      for (const [key, value] of Object.entries(dto)) {
+        req.field(key, value);
+      }
+      const res = await req.expect(201);
+      validateObj({ type: SendDtoRes, obj: res.body });
+    }
+    const codes = await recoveryCodeRepository.find({
+      relations: { user: true },
+      where: { user: { id: In(savedUsers.map(user => user.id)) } },
+    });
+    const isCorrect = codes.every(
+      code => userIds.has(code.user.id)
+    );
+    expect(true).toEqual(isCorrect);
+
+    const recoveryTokens: string[] = []; 
+    for (const code of codes) {
+      const dto: ConfirmDtoReq = {
+        code: code.code
+      };
+      const req = request(app.getHttpServer()).post('/auth/confirm-code')
+
+      for (const [key, value] of Object.entries(dto)) {
+        req.field(key, value);
+      }
+      const res = await req.expect(201);
+      validateObj({ type: ConfirmDtoRes, obj: res.body });
+      recoveryTokens.push(res.body.recoveryToken);
+    }
+    // TODO: Change Password
   });
 
   afterEach(() => {
