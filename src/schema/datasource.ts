@@ -20,5 +20,5 @@ export const dataSourceUserOption: DataSourceOptions = {
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
   synchronize: true,
   //ssl: tlsOptions,
-  logging: true,
+  logging: false,
 };
