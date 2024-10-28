@@ -24,8 +24,9 @@ export class RecoveryService {
 
   @Inject()
   private readonly jwtService: JwtService;
-
-  constructor(private readonly emailService: EmailService) { }
+  
+  @Inject()
+  private readonly emailService: EmailService;
 
   public async sendCode(dto: SendDtoReq): Promise<SendDtoRes> {
     const user = await this.usersRepository.findOneBy({ email: dto.email });
@@ -49,8 +50,8 @@ export class RecoveryService {
     if (!recoveryCode) {
       throw new BadRequestException();
     }
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     await this.recoveryCodeRepository.delete(recoveryCode.id);
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     if (recoveryCode.created_at >= fiveMinutesAgo) {
       throw new BadRequestException();
     }

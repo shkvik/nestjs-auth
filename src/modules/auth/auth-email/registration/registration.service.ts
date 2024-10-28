@@ -22,9 +22,9 @@ export class RegistrationService {
 
   @Inject()
   private readonly jwtService: JwtService;
-
-
-  constructor(private readonly emailService: EmailService) { }
+  
+  @Inject()
+  private readonly emailService: EmailService
 
   public async createAccount(dto: CreateDtoReq): Promise<CreateDtoRes> {
     const isUserExists = await this.usersRepository.findOne({
@@ -59,18 +59,14 @@ export class RegistrationService {
     }
     user.is_active = true;
     await this.usersRepository.update(user.id, user);
-    const { accessToken, refreshToken } = await this.jwtService
-      .createJwtTokens(user.id);
-
-    return this.getRedirectURL(accessToken, refreshToken);
+    const tokens = await this.jwtService.createJwtTokens(user.id);
+    return this.getRedirectURL(tokens.accessToken, tokens.refreshToken);
   }
 
   public getRedirectURL(accessToken: string, refreshToken: string): string {
     const redirectUrl = new URL(CONFIG_EMAIL.REDIRECT_URL);
-
     redirectUrl.searchParams.append('accessToken', accessToken);
     redirectUrl.searchParams.append('refreshToken', refreshToken);
-
     return redirectUrl.toString();
   }
 }
