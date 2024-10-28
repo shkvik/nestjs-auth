@@ -21,6 +21,9 @@ function getRandomIndex(size: number) {
   return Math.floor(Math.random() * size)
 }
 
+const specialChars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '-', '=', '[', ']', '{', '}', ';', ':', '"', ',', '.', '<', '>', '?', '/', '\\', '|', '~'];
+
+
 describe('Tests (e2e)', () => {
   const mockEmailService = {
     sendActivationMail: jest.fn(),
@@ -32,7 +35,6 @@ describe('Tests (e2e)', () => {
   let transactionRunner: QueryRunner;
   let usersRepository: Repository<User>;
   let jwtRepository: Repository<JwtToken>;
-
 
   beforeAll(async () => {
     dataSource = new DataSource(dataSourceUserOption);
@@ -56,6 +58,8 @@ describe('Tests (e2e)', () => {
       .useValue(jwtRepository)
       .overrideProvider(getRepositoryToken(User))
       .useValue(usersRepository)
+      .overrideProvider(EmailService)
+      .useValue(mockEmailService)
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -78,16 +82,14 @@ describe('Tests (e2e)', () => {
 
       const randomIndex = getRandomIndex(8);
       const passwordArr = Array.from(faker.internet.password({ length: 16 }))
-      passwordArr[randomIndex] = passwordArr[randomIndex].toUpperCase();
+      passwordArr[randomIndex] = faker.helpers.arrayElement(specialChars);
 
       const email = faker.internet
-        .email({ firstName: randomUUID() })
-        .replaceAll('-', '');
+        .email({ allowSpecialCharacters: false })
 
-      const password = passwordArr.join('');
       return {
         email: email,
-        password: password
+        password: passwordArr.join('')
       } as CreateDtoReq
     })
     for (const input of testArr) {
@@ -97,6 +99,7 @@ describe('Tests (e2e)', () => {
       for (const [key, value] of Object.entries(input)) {
         ter.field(key, value);
       }
+      console.log(input)
       await ter.expect(201);
     }
   });
