@@ -14,34 +14,6 @@ export class JwtService {
   @InjectRepository(JwtToken)
   private jwtRepository: Repository<JwtToken>;
 
-  public getJwtPayload(token: string, key: string): JwtPayload | string {
-    try {
-      return verify(token, key);
-    } catch {
-      return null;
-    }
-  }
-
-  public async deleteAllTokens(user_id: number) {
-    //return await this.jwtRepository.delete({ user: user_id });
-  }
-
-  // public async findTokenByUserId(user_id: number): Promise<JwtToken> {
-  //   //return await this.jwtRepository.findOne({ where: { user_id: user_id } });
-  //   return {
-  //     user: null,
-  //     ip: '',
-  //     browser: '',
-  //     platform: '',
-  //     os: '',
-  //     refresh_token: '',
-  //     id: 0,
-  //     version: '',
-  //     created_at: undefined,
-  //     updated_at: undefined
-  //   }
-  // }
-
   public async findTokenByRefreshToken(refresh_token: string): Promise<JwtToken> {
     return await this.jwtRepository.findOne({
       where: { refresh_token: refresh_token },
@@ -54,7 +26,7 @@ export class JwtService {
     });
   }
 
-  public async createJwtTokens(userId: number) {
+  public async createJwtTokens(userId: number): Promise<JwtPair> {
     const sessionId = randomUUID();
     const { accessToken, refreshToken } = this.generateAuthTokens({
       userId: userId,
@@ -93,6 +65,14 @@ export class JwtService {
     return sign({ userId }, CONFIG_AUTH.JWT_RECOVERY, {
       expiresIn: CONFIG_AUTH.JWT_RECOVERY_EXP
     });
+  }
+
+  public getJwtPayload(token: string, key: string): JwtPayload | string {
+    try {
+      return verify(token, key);
+    } catch {
+      return null;
+    }
   }
 
   private generateAuthTokens(payload: JwtAuthPayload): JwtPair {
