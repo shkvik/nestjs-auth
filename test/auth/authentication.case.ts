@@ -1,9 +1,8 @@
 import { faker } from "@faker-js/faker/.";
 import { INestApplication } from "@nestjs/common";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import { ActivateDtoReq, CreateDtoReq } from "src/modules/auth/auth-email/registration/dto";
 import { User } from "src/schema/users/user.entity";
-import { In, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import * as request from 'supertest';
 import { JwtAuthPayload, JwtPair } from "src/modules/auth/common/jwt/interface/jwt.interface";
 import { hash } from "bcrypt";
@@ -117,16 +116,5 @@ export class AuthenticationCase {
         password: userInputs.get(user.email)
       } as LoginDtoReq
     });
-  }
-
-  private createFakeDtoCreate(size: number): CreateDtoReq[] {
-    const fakeDtoes = Array.from({ length: size }, () => {
-      return {
-        email: faker.internet.email(),
-        password: faker.internet.password({ length: 16 })
-      } as CreateDtoReq
-    });
-
-    return fakeDtoes;
   }
 }
