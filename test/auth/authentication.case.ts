@@ -7,8 +7,8 @@ import { In, Repository } from "typeorm";
 import * as request from 'supertest';
 import { JwtAuthPayload, JwtPair } from "src/modules/auth/common/jwt/interface/jwt.interface";
 import { hash } from "bcrypt";
-import { validateObj } from "test/auth/utilities";
-import { LoginDtoReq, LoginDtoRes } from "src/modules/auth/auth-email/authentication/dto";
+import { validateObj } from "../../test/auth/utilities";
+import { LoginDtoReq, LoginDtoRes, RefreshDtoRes } from "src/modules/auth/auth-email/authentication/dto";
 import { verify } from 'jsonwebtoken';
 import { CONFIG_AUTH } from "src/config/config.export";
 
@@ -19,9 +19,6 @@ export class AuthenticationCase {
 
   public async login(size: number = 10) {
     const userTokens = new Map<number, JwtPair>();
-    const usersRepository = this.app.get<Repository<User>>(
-      getRepositoryToken(User)
-    );
     const dtos = await this.createFakeDtoLogin(size);
 
     for (const dto of dtos) {
@@ -32,17 +29,43 @@ export class AuthenticationCase {
       }
       const res = await req.expect(201);
       const body = res.body as LoginDtoRes;
-      
+
       validateObj({ type: LoginDtoRes, obj: res.body });
-      
+
       const tokenPayload = verify(
-        body.accessToken, 
+        body.accessToken,
         CONFIG_AUTH.JWT_ACCESS
       ) as JwtAuthPayload;
 
       userTokens.set(tokenPayload.userId, res.body as JwtPair);
     }
     return userTokens;
+  }
+
+  public async refreshTokens(size: number = 10) {
+    const refreshTokens = await this.createFakeDtoRefreshTokens(size);
+
+    for (const refreshToken of refreshTokens) {
+      const res = await request(this.app.getHttpServer())
+        .get('/auth/refresh-token')
+        .set('Authorization', `Bearer ${refreshToken}`)
+        .expect(200);
+
+      validateObj({ type: RefreshDtoRes, obj: res.body });
+    }
+  }
+
+  public async logout(size: number = 10) {
+    const accessTokens = await this.createFakeDtoLogout(size);
+
+    for (const accessToken of accessTokens) {
+      const res = await request(this.app.getHttpServer())
+        .get('/auth/logout')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(res.body).toEqual({});
+    }
   }
 
   private async createFakeUsers(size: number) {
@@ -65,10 +88,20 @@ export class AuthenticationCase {
         is_active: true,
       });
     });
-    return { 
-      fakeUsers: await Promise.all(fakeUsers), 
+    return {
+      fakeUsers: await Promise.all(fakeUsers),
       userInputs
     }
+  }
+  
+  private async createFakeDtoLogout(size: number): Promise<string[]> {
+    const tokens = await this.login(size);
+    return Array.from(tokens).map(val => val[1].accessToken);
+  }
+
+  private async createFakeDtoRefreshTokens(size: number): Promise<string[]> {
+    const tokens = await this.login(size);
+    return Array.from(tokens).map(val => val[1].refreshToken);
   }
 
   private async createFakeDtoLogin(size: number): Promise<LoginDtoReq[]> {

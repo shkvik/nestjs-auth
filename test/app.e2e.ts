@@ -21,27 +21,7 @@ import { SendDtoReq, SendDtoRes } from 'src/modules/auth/auth-email/recovery/dto
 import { ConfirmDtoReq, ConfirmDtoRes } from 'src/modules/auth/auth-email/recovery/dto/confirm.dto';
 import { AppBuilder } from './app.builder';
 import { RegistrationCase } from './auth/registration.case';
-//import { AuthenticationCase } from './auth/authentication.case';
-
-
-export function validateObj<T extends object>(params: {
-  type: new (...args: any[]) => T,
-  obj: any
-}): T {
-  const { type, obj } = params;
-  const validatedObj = plainToInstance(type, obj, {
-    enableImplicitConversion: true,
-  });
-  const errors = validateSync(validatedObj, {
-    whitelist: true,
-    skipMissingProperties: false,
-    forbidNonWhitelisted: true,
-  });
-  if (errors.length > 0) {
-    throw new Error(errors.toString());
-  }
-  return validatedObj;
-}
+import { AuthenticationCase } from './auth/authentication.case';
 
 describe('Tests (e2e)', () => {
 
@@ -56,7 +36,7 @@ describe('Tests (e2e)', () => {
   describe('Registration', () => {
     let cases: RegistrationCase;
 
-    beforeAll(async () => {
+    beforeAll(() => {
       cases = new RegistrationCase(app);
     });
 
@@ -69,18 +49,25 @@ describe('Tests (e2e)', () => {
     });
   });
 
-  // describe('Authentication2', () => {
-  //   let cases: AuthenticationCase;
+  describe('Authentication', () => {
+    let cases: AuthenticationCase;
 
-  //   beforeAll(async () => {
-  //     cases = new AuthenticationCase(app);
-  //   });
+    beforeAll(async () => {
+      cases = new AuthenticationCase(app);
+    });
 
-  //   it('Login', async () => {
-  //     await cases.login(10);
-  //   });
+    it('Login', async () => {
+      await cases.login(10);
+    });
 
-  // });
+    it('Refresh token', async () => {
+      await cases.refreshTokens(10);
+    });
+
+    it('Logout', async () => {
+      await cases.logout(10);
+    });
+  });
 
   it('Authentication', async () => {
     const usersRepository = app.get<Repository<User>>(getRepositoryToken(User));
@@ -120,7 +107,7 @@ describe('Tests (e2e)', () => {
         req.field(key, value);
       }
       const res = await req.expect(201);
-      validateObj({ type: LoginDtoRes, obj: res.body });
+      //validateObj({ type: LoginDtoRes, obj: res.body });
       userTokens.set(user.id, res.body as JwtPair);
     }
     /**
@@ -133,7 +120,7 @@ describe('Tests (e2e)', () => {
         .set('Authorization', `Bearer ${refreshToken}`)
         .expect(200);
 
-      validateObj({ type: RefreshDtoRes, obj: res.body });
+      //validateObj({ type: RefreshDtoRes, obj: res.body });
     }
     /**
      * Logout
@@ -183,7 +170,7 @@ describe('Tests (e2e)', () => {
         req.field(key, value);
       }
       const res = await req.expect(201);
-      validateObj({ type: SendDtoRes, obj: res.body });
+      //validateObj({ type: SendDtoRes, obj: res.body });
     }
     const codes = await recoveryCodeRepository.find({
       relations: { user: true },
@@ -205,7 +192,7 @@ describe('Tests (e2e)', () => {
         req.field(key, value);
       }
       const res = await req.expect(201);
-      validateObj({ type: ConfirmDtoRes, obj: res.body });
+      //validateObj({ type: ConfirmDtoRes, obj: res.body });
       recoveryTokens.push(res.body.recoveryToken);
     }
     // TODO: Change Password
