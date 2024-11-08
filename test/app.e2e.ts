@@ -1,25 +1,76 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from '../src/modules/app/app.module';
+import { AppBuilder } from './app.builder';
+import { RegistrationCase } from './auth/registration.case';
+import { AuthenticationCase } from './auth/authentication.case';
+import { RecoveryCase } from './auth/recovery.case';
 
+describe('Tests (e2e)', () => {
 
-describe('AppController (e2e)', () => {
   let app: INestApplication;
+  let builder: AppBuilder;
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+  beforeAll(async () => {
+    builder = new AppBuilder();
+    app = await builder.create();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  describe('Registration', () => {
+    let cases: RegistrationCase;
+
+    beforeAll(() => {
+      cases = new RegistrationCase(app);
+    });
+
+    it('Create accounts', async () => {
+      await cases.createAccounts();
+    });
+
+    it('Activate accounts', async () => {
+      await cases.activateAccounts();
+    });
+  });
+
+  describe('Authentication', () => {
+    let cases: AuthenticationCase;
+
+    beforeAll(async () => {
+      cases = new AuthenticationCase(app);
+    });
+
+    it('Login', async () => {
+      await cases.login();
+    });
+
+    it('Refresh token', async () => {
+      await cases.refreshTokens();
+    });
+
+    it('Logout', async () => {
+      await cases.logout();
+    });
+  });
+
+  describe('Recovery', () => {
+    let cases: RecoveryCase;
+
+    beforeAll(async () => {
+      cases = new RecoveryCase(app);
+    });
+
+    it('Send Code', async () => {
+      await cases.sendCodes();
+    });
+
+    it('Confirm Code', async () => {
+      await cases.confirmCode();
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterAll(async () => {
+    await builder.dispose()
   });
 });
