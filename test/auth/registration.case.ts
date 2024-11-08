@@ -31,7 +31,7 @@ export class RegistrationCase {
     return createdUsers;
   }
 
-  public async activateAccounts(size: number): Promise<void> {
+  public async activateAccounts(size: number = 10): Promise<User[]> {
     const createdUsers = await this.createAccounts(size);
     const dtos = this.createFakeDtoActivate(createdUsers);
 
@@ -51,6 +51,8 @@ export class RegistrationCase {
     const createdIds = createdUsers.map(user => user.id).sort();
 
     expect(activatedIds).toStrictEqual(createdIds);
+
+    return activatedUsers;
   }
 
   private createFakeDtoActivate(users: User[]): ActivateDtoReq[] {
