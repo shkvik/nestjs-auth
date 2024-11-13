@@ -10,7 +10,7 @@ import {
 @Injectable()
 export class BaseGuard implements CanActivate {
 
-  constructor(private readonly jwtKey: string) { }
+  constructor(protected readonly jwtKey: string) { }
 
   public canActivate(context: ExecutionContext): boolean {
     const request: Request = context.switchToHttp().getRequest();

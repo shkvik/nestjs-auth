@@ -9,9 +9,7 @@ export class RefreshDtoReq {
   refreshToken: string;
 }
 
-export class RefreshDtoRes implements JwtPair {
+export class RefreshDtoRes {
   @Allow()
   accessToken: string;
-  @Allow()
-  refreshToken: string;
 }

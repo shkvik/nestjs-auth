@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { Allow, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ActivateDtoReq {
@@ -9,4 +9,7 @@ export class ActivateDtoReq {
   activationLink: string;
 }
 
-export type ActivateDtoRes = { url: string };
+export class ActivateDtoRes {
+  @Allow()
+  accessToken: string;
+}

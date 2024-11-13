@@ -8,6 +8,7 @@ import { JwtToken } from "src/schema/jwt-tokens/jwt.token.entity";
 import { RecoveryCode } from "src/schema/recovery-code/recovery-code.entity";
 import { User } from "src/schema/users/user.entity";
 import { DataSource, QueryRunner } from "typeorm";
+import { initializeTransactionalContext } from "typeorm-transactional";
 
 export class AppBuilder {
   private app: INestApplication;
@@ -15,6 +16,8 @@ export class AppBuilder {
   private transactionRunner: QueryRunner;
   
   public async create() {
+    initializeTransactionalContext();
+    
     this.dataSource = new DataSource(dataSourceUserOption);
     await this.dataSource.initialize();
 

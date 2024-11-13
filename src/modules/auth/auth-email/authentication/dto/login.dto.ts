@@ -15,9 +15,7 @@ export class LoginDtoReq {
   public password: string;
 }
 
-export class LoginDtoRes implements JwtPair {
+export class LoginDtoRes {
   @Allow()
   accessToken: string;
-  @Allow()
-  refreshToken: string;
 }

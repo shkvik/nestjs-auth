@@ -11,6 +11,7 @@ import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
 import { ChangeDtoReq, ChangeDtoRes } from './dto/change.dto';
 import { JwtAuthPayload } from '../../common/jwt/interface/jwt.interface';
 import { hash } from 'bcrypt';
+import { Transactional } from 'typeorm-transactional';
 
 
 @Injectable()
@@ -28,6 +29,7 @@ export class RecoveryService {
   @Inject()
   private readonly emailService: EmailService;
 
+  @Transactional()
   public async sendCode(dto: SendDtoReq): Promise<SendDtoRes> {
     const user = await this.usersRepository.findOne({ 
       relationLoadStrategy: 'join',
@@ -47,6 +49,7 @@ export class RecoveryService {
     return { result: true };
   }
 
+  @Transactional()
   public async confirmCode(dto: ConfirmDtoReq): Promise<ConfirmDtoRes> {
     const recoveryCode = await this.recoveryCodeRepository.findOne({
       relations: { user: true },
@@ -66,6 +69,7 @@ export class RecoveryService {
     return { recoveryToken };
   }
 
+  @Transactional()
   public async changePassword(dto: ChangeDtoReq & JwtAuthPayload): Promise<ChangeDtoRes> {
     const user = await this.usersRepository.findOne({
       select: { id: true },
@@ -82,12 +86,10 @@ export class RecoveryService {
   }
 
   private getCryptoCode(codeSize: number): string {
-    const min = 0, max = 99;
-    let result = '';
-    for (let i = 0; i < codeSize; i++) {
-      const random = min + (randomBytes(4).readUInt32BE(0) % max - min + 1);
-      result += String(`${random}.`);
-    }
-    return result;
+    const min = 0, max = 9;
+    const code = Array.from({ length: codeSize }, () => {
+      return min + (randomBytes(1).readUInt8(0) % max - min + 1)
+    })
+    return code.join('');
   }
 }

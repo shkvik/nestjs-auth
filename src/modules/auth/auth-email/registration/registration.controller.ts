@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Query, Redirect, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseInterceptors } from '@nestjs/common';
 import { RegistrationService } from './registration.service';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { 
   ActivateDtoReq, 
@@ -22,9 +23,13 @@ export class RegistrationController {
     return this.registrationService.createAccount(dto);
   }
 
-  @Get('activate-account')
-  @Redirect()
-  public async activateAccount(@Query() dto: ActivateDtoReq): Promise<ActivateDtoRes> {
-    return { url: await this.registrationService.activateAccount(dto) };
+  @Post('activate-account')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: ActivateDtoReq })
+  public async activateAccount(
+    @Res({ passthrough: true }) res: Response,
+    @Body() dto: ActivateDtoReq
+  ): Promise<ActivateDtoRes> {
+    return this.registrationService.activateAccount(res, dto);
   }
 }
