@@ -25,27 +25,22 @@ describe('Tests (e2e)', () => {
       await cases.activateAccounts();
     });
   });
-
   describe('Authentication', () => {
     let cases: AuthenticationCase;
 
     beforeAll(async () => {
       cases = new AuthenticationCase(app);
     });
-
     it('Login', async () => {
       await cases.login();
     });
-
     it('Refresh token', async () => {
       await cases.refreshTokens();
     });
-
     it('Logout', async () => {
       await cases.logout();
     });
   });
-
   describe('Recovery', () => {
     let cases: RecoveryCase;
 
@@ -59,11 +54,9 @@ describe('Tests (e2e)', () => {
       await cases.confirmCode();
     });
   });
-
   afterEach(() => {
     jest.clearAllMocks();
   });
-
   afterAll(async () => {
     await builder.dispose();
   });

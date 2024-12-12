@@ -9,6 +9,7 @@ import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
 import { User } from 'src/schema/users/user.entity';
 import { DataSource, QueryRunner } from 'typeorm';
 import { initializeTransactionalContext } from 'typeorm-transactional';
+import * as cookieParser from 'cookie-parser';
 
 export class AppBuilder {
   private app: INestApplication;
@@ -50,7 +51,7 @@ export class AppBuilder {
       .compile();
 
     this.app = moduleFixture.createNestApplication();
-
+    this.app.use(cookieParser());
     this.app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,

@@ -23,7 +23,10 @@ export class AuthenticationCase {
 
   public async login(size: number = 10): Promise<Map<number, JwtPair>> {
     const userTokens = new Map<number, JwtPair>();
-    const dtos = await this.createFakeDtoLogin(size);
+    const { dtos, fakeUsers } = await this.createFakeDtoLogin(size);
+    const userMap = new Map<number, User>(
+      fakeUsers.map((user) => [user.id, user]),
+    );
 
     for (const dto of dtos) {
       const req = request(this.app.getHttpServer()).post('/auth/login');
@@ -34,14 +37,34 @@ export class AuthenticationCase {
       const res = await req.expect(201);
       const body = res.body as LoginDtoRes;
 
-      validateObj({ type: LoginDtoRes, obj: res.body });
+      validateObj({ type: LoginDtoRes, obj: body });
 
-      const tokenPayload = verify(
-        body.accessToken,
+      const { accessToken } = body;
+      const cookies = res.headers['set-cookie'][0];
+      const refreshToken = cookies.split(';')[0].split('%20')[1];
+
+      const accessTokenPayload = verify(
+        accessToken,
         CONFIG_AUTH.JWT_ACCESS,
       ) as JwtAuthPayload;
 
-      userTokens.set(tokenPayload.userId, res.body as JwtPair);
+      const refreshTokenPayload = verify(
+        refreshToken,
+        CONFIG_AUTH.JWT_REFRESH,
+      ) as JwtAuthPayload;
+
+      expect(userMap.has(accessTokenPayload.userId));
+      expect(userMap.has(refreshTokenPayload.userId));
+      expect(accessTokenPayload.userId).toEqual(refreshTokenPayload.userId);
+
+      const user = userMap.get(accessTokenPayload.userId);
+
+      expect(user.email).toEqual(dto.email);
+
+      userTokens.set(accessTokenPayload.userId, {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      });
     }
     return userTokens;
   }
@@ -52,7 +75,7 @@ export class AuthenticationCase {
     for (const refreshToken of refreshTokens) {
       const res = await request(this.app.getHttpServer())
         .get('/auth/refresh-token')
-        .set('Authorization', `Bearer ${refreshToken}`)
+        .set('Cookie', [`refreshToken=Bearer ${refreshToken}`])
         .expect(200);
 
       validateObj({ type: RefreshDtoRes, obj: res.body });
@@ -107,21 +130,27 @@ export class AuthenticationCase {
 
   private async createFakeDtoRefreshTokens(size: number): Promise<string[]> {
     const tokens = await this.login(size);
-    return Array.from(tokens).map((val) => val[1].refreshToken);
+    return Array.from(tokens).map(([_, jwtPair]) => jwtPair.refreshToken);
   }
 
-  private async createFakeDtoLogin(size: number): Promise<LoginDtoReq[]> {
+  private async createFakeDtoLogin(size: number): Promise<{
+    dtos: LoginDtoReq[];
+    fakeUsers: User[];
+  }> {
     const usersRepository = this.app.get<Repository<User>>(
       getRepositoryToken(User),
     );
     const { fakeUsers, userInputs } = await this.createFakeUsers(size);
     const savedUsers = await usersRepository.save(fakeUsers);
 
-    return savedUsers.map((user) => {
-      return {
-        email: user.email,
-        password: userInputs.get(user.email),
-      } as LoginDtoReq;
-    });
+    return {
+      fakeUsers: savedUsers,
+      dtos: savedUsers.map((user) => {
+        return {
+          email: user.email,
+          password: userInputs.get(user.email),
+        } as LoginDtoReq;
+      }),
+    };
   }
 }

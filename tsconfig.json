@@ -21,6 +21,6 @@
     "noUnusedParameters": true,
     "noImplicitOverride": true,
     "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
+    "allowUnusedLabels": false
   }
 }

@@ -4,10 +4,12 @@ import { CONFIG_APP } from './config/config.export';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { initializeTransactionalContext } from 'typeorm-transactional';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap(): Promise<void> {
   initializeTransactionalContext();
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
