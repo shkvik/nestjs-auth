@@ -15,15 +15,12 @@ describe('Tests (e2e)', () => {
 
   describe('Registration', () => {
     let cases: RegistrationCase;
-
     beforeAll(() => {
       cases = new RegistrationCase(app);
     });
-
     it('Create accounts', async () => {
       await cases.createAccounts();
     });
-
     it('Activate accounts', async () => {
       await cases.activateAccounts();
     });
@@ -55,11 +52,9 @@ describe('Tests (e2e)', () => {
     beforeAll(async () => {
       cases = new RecoveryCase(app);
     });
-
     it('Send Code', async () => {
       await cases.sendCodes();
     });
-
     it('Confirm Code', async () => {
       await cases.confirmCode();
     });

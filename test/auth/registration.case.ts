@@ -44,9 +44,9 @@ export class RegistrationCase {
     );
     for (const dto of dtos) {
       await request(this.app.getHttpServer())
-        .get('/auth/activate-account')
-        .query({ activationLink: dto.activationLink })
-        .expect(302);
+        .post('/auth/activate-account')
+        .field('activationLink', dto.activationLink)
+        .expect(201);
     }
     const activatedUsers = await usersRepository.find({
       where: { id: In(createdUsers.map((user) => user.id)) },

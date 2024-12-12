@@ -26,6 +26,7 @@ export class RegistrationController {
   @Post('activate-account')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: ActivateDtoReq })
+  @UseInterceptors(FileInterceptor('file'))
   public async activateAccount(
     @Res({ passthrough: true }) res: Response,
     @Body() dto: ActivateDtoReq,

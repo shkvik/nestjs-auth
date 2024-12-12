@@ -4,19 +4,19 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from 'src/schema/users/user.entity';
 import { Repository } from 'typeorm';
 import * as request from 'supertest';
+import { verify } from 'jsonwebtoken';
+import { CONFIG_AUTH } from 'src/config/config.export';
+import { hash } from 'bcrypt';
+import { validateObj } from '../../test/auth/utilities';
 import {
   JwtAuthPayload,
   JwtPair,
 } from 'src/modules/auth/common/jwt/interface/jwt.interface';
-import { hash } from 'bcrypt';
-import { validateObj } from '../../test/auth/utilities';
 import {
   LoginDtoReq,
   LoginDtoRes,
   RefreshDtoRes,
 } from 'src/modules/auth/auth-email/authentication/dto';
-import { verify } from 'jsonwebtoken';
-import { CONFIG_AUTH } from 'src/config/config.export';
 
 export class AuthenticationCase {
   constructor(private readonly app: INestApplication) {}

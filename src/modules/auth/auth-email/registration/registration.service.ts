@@ -5,16 +5,16 @@ import { User } from 'src/schema/users/user.entity';
 import { JwtService } from '../../common/jwt/jwt.service';
 import { EmailService } from '../services/email/email.service';
 import { setCookieRefreshToken } from '../../common/utilities/utilities.cookies';
+import { CONFIG_EMAIL } from 'src/config/config.export';
+import { randomUUID } from 'crypto';
+import { Response } from 'express';
+import { IsolationLevel, Transactional } from 'typeorm-transactional';
 import {
   ActivateDtoReq,
   ActivateDtoRes,
   CreateDtoReq,
   CreateDtoRes,
 } from './dto';
-import { CONFIG_EMAIL } from 'src/config/config.export';
-import { randomUUID } from 'crypto';
-import { Response } from 'express';
-import { IsolationLevel, Transactional } from 'typeorm-transactional';
 import {
   BadRequestException,
   ConflictException,
