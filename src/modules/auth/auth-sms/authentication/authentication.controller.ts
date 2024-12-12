@@ -25,8 +25,8 @@ import {
   SendDtoRes,
 } from './dto';
 
-@Controller('auth')
-@ApiTags('Auth')
+@Controller('auth-sms')
+@ApiTags('Auth SMS')
 export class AuthenticationController {
   @Inject()
   private authorizationService: AuthenticationService;
