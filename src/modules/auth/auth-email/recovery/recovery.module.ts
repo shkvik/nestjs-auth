@@ -10,4 +10,4 @@ import { RecoveryCodeDBModule } from 'src/schema/recovery-code/recovery-code.mod
   controllers: [RecoveryController],
   providers: [RecoveryService],
 })
-export class RecoveryModule { }
+export class RecoveryModule {}

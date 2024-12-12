@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Transporter, createTransport } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import { CONFIG_APP } from 'src/config/config.export';
+import { MockMethod } from 'src/modules/auth/common/utilities/mock.decorator';
 
 const tmp_email = 'tmp_email';
 const tmp_password = 'tmp_password';
@@ -22,7 +24,11 @@ export class EmailService {
     });
   }
 
-  public async sendActivationMail(options: { to: string; link: string }): Promise<void> {
+  @MockMethod({ condition: () => CONFIG_APP.NODE_ENV === 'local' })
+  public async sendActivationMail(options: {
+    to: string;
+    link: string;
+  }): Promise<void> {
     await this.Transporter.sendMail({
       from: tmp_email,
       to: options.to,
@@ -36,7 +42,11 @@ export class EmailService {
     });
   }
 
-  public async sendRecoveryCode(options: { to: string; code: string }): Promise<void> {
+  @MockMethod({ condition: () => CONFIG_APP.NODE_ENV === 'local' })
+  public async sendRecoveryCode(options: {
+    to: string;
+    code: string;
+  }): Promise<void> {
     await this.Transporter.sendMail({
       from: tmp_email,
       to: options.to,

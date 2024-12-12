@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, IsStrongPassword, Allow } from 'class-validator';
-import { JwtPair } from '../../../common/jwt/interface/jwt.interface';
+import { IsString, IsEmail, Allow } from 'class-validator';
 
 export class LoginDtoReq {
   @ApiProperty({
@@ -15,9 +14,7 @@ export class LoginDtoReq {
   public password: string;
 }
 
-export class LoginDtoRes implements JwtPair {
+export class LoginDtoRes {
   @Allow()
   accessToken: string;
-  @Allow()
-  refreshToken: string;
 }

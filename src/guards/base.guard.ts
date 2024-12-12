@@ -4,17 +4,19 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
-  UnauthorizedException
+  UnauthorizedException,
 } from '@nestjs/common';
 
 @Injectable()
 export class BaseGuard implements CanActivate {
-
-  constructor(private readonly jwtKey: string) { }
+  constructor(protected readonly jwtKey: string) {}
 
   public canActivate(context: ExecutionContext): boolean {
     const request: Request = context.switchToHttp().getRequest();
-    request['jwt'] = this.getPayload(request.headers.authorization, this.jwtKey);
+    request['jwt'] = this.getPayload(
+      request.headers.authorization,
+      this.jwtKey,
+    );
     return true;
   }
 

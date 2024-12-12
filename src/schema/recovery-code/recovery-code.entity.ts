@@ -4,7 +4,6 @@ import { User } from '../users/user.entity';
 
 @Entity({ name: 'recovery_code' })
 export class RecoveryCode extends BaseEntity {
-
   @Column()
   code: string;
 

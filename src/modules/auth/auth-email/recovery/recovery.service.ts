@@ -11,11 +11,10 @@ import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
 import { ChangeDtoReq, ChangeDtoRes } from './dto/change.dto';
 import { JwtAuthPayload } from '../../common/jwt/interface/jwt.interface';
 import { hash } from 'bcrypt';
-
+import { Transactional } from 'typeorm-transactional';
 
 @Injectable()
 export class RecoveryService {
-
   @InjectRepository(User)
   private readonly usersRepository: Repository<User>;
 
@@ -24,18 +23,19 @@ export class RecoveryService {
 
   @Inject()
   private readonly jwtService: JwtService;
-  
+
   @Inject()
   private readonly emailService: EmailService;
 
+  @Transactional()
   public async sendCode(dto: SendDtoReq): Promise<SendDtoRes> {
-    const user = await this.usersRepository.findOne({ 
+    const user = await this.usersRepository.findOne({
       relationLoadStrategy: 'join',
       relations: { recoveryCode: true },
-      select: { id: true, recoveryCode: { id: true} },
-      where: { email: dto.email }
+      select: { id: true, recoveryCode: { id: true } },
+      where: { email: dto.email },
     });
-    if (!user || user.recoveryCode ) {
+    if (!user || user.recoveryCode) {
       throw new BadRequestException();
     }
     const code = this.getCryptoCode(6);
@@ -47,10 +47,11 @@ export class RecoveryService {
     return { result: true };
   }
 
+  @Transactional()
   public async confirmCode(dto: ConfirmDtoReq): Promise<ConfirmDtoRes> {
     const recoveryCode = await this.recoveryCodeRepository.findOne({
       relations: { user: true },
-      where: { code: dto.code }
+      where: { code: dto.code },
     });
     if (!recoveryCode) {
       throw new BadRequestException();
@@ -60,34 +61,36 @@ export class RecoveryService {
     if (recoveryCode.created_at >= fiveMinutesAgo) {
       throw new BadRequestException();
     }
-    const recoveryToken = await this.jwtService
-      .getRecoveryToken(recoveryCode.user.id);
-
+    const recoveryToken = await this.jwtService.getRecoveryToken(
+      recoveryCode.user.id,
+    );
     return { recoveryToken };
   }
 
-  public async changePassword(dto: ChangeDtoReq & JwtAuthPayload): Promise<ChangeDtoRes> {
+  @Transactional()
+  public async changePassword(
+    dto: ChangeDtoReq & JwtAuthPayload,
+  ): Promise<ChangeDtoRes> {
     const user = await this.usersRepository.findOne({
       select: { id: true },
-      where: { id: dto.userId }
+      where: { id: dto.userId },
     });
     if (!user) {
       throw new BadRequestException();
     }
     const hashPassword = await hash(dto.password, 3);
     await this.usersRepository.update(user, {
-      password: hashPassword
+      password: hashPassword,
     });
-    return this.jwtService.createJwtTokens(dto.userId);;
+    return this.jwtService.createJwtTokens(dto.userId);
   }
 
   private getCryptoCode(codeSize: number): string {
-    const min = 0, max = 99;
-    let result = '';
-    for (let i = 0; i < codeSize; i++) {
-      const random = min + (randomBytes(4).readUInt32BE(0) % max - min + 1);
-      result += String(`${random}.`);
-    }
-    return result;
+    const min = 0;
+    const max = 9;
+    const code = Array.from({ length: codeSize }, () => {
+      return min + ((randomBytes(1).readUInt8(0) % max) - min + 1);
+    });
+    return code.join('');
   }
 }

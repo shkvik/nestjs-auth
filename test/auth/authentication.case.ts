@@ -1,27 +1,35 @@
-import { faker } from "@faker-js/faker/.";
-import { INestApplication } from "@nestjs/common";
-import { getRepositoryToken } from "@nestjs/typeorm";
-import { User } from "src/schema/users/user.entity";
-import { Repository } from "typeorm";
+import { faker } from '@faker-js/faker/.';
+import { INestApplication } from '@nestjs/common';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { User } from 'src/schema/users/user.entity';
+import { Repository } from 'typeorm';
 import * as request from 'supertest';
-import { JwtAuthPayload, JwtPair } from "src/modules/auth/common/jwt/interface/jwt.interface";
-import { hash } from "bcrypt";
-import { validateObj } from "../../test/auth/utilities";
-import { LoginDtoReq, LoginDtoRes, RefreshDtoRes } from "src/modules/auth/auth-email/authentication/dto";
 import { verify } from 'jsonwebtoken';
-import { CONFIG_AUTH } from "src/config/config.export";
-
+import { CONFIG_AUTH } from 'src/config/config.export';
+import { hash } from 'bcrypt';
+import { validateObj } from '../../test/auth/utilities';
+import {
+  JwtAuthPayload,
+  JwtPair,
+} from 'src/modules/auth/common/jwt/interface/jwt.interface';
+import {
+  LoginDtoReq,
+  LoginDtoRes,
+  RefreshDtoRes,
+} from 'src/modules/auth/auth-email/authentication/dto';
 
 export class AuthenticationCase {
+  constructor(private readonly app: INestApplication) {}
 
-  constructor(private readonly app: INestApplication) { }
-
-  public async login(size: number = 10) {
+  public async login(size: number = 10): Promise<Map<number, JwtPair>> {
     const userTokens = new Map<number, JwtPair>();
-    const dtos = await this.createFakeDtoLogin(size);
+    const { dtos, fakeUsers } = await this.createFakeDtoLogin(size);
+    const userMap = new Map<number, User>(
+      fakeUsers.map((user) => [user.id, user]),
+    );
 
     for (const dto of dtos) {
-      const req = request(this.app.getHttpServer()).post('/auth/login')
+      const req = request(this.app.getHttpServer()).post('/auth/login');
 
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);
@@ -29,32 +37,52 @@ export class AuthenticationCase {
       const res = await req.expect(201);
       const body = res.body as LoginDtoRes;
 
-      validateObj({ type: LoginDtoRes, obj: res.body });
+      validateObj({ type: LoginDtoRes, obj: body });
 
-      const tokenPayload = verify(
-        body.accessToken,
-        CONFIG_AUTH.JWT_ACCESS
+      const { accessToken } = body;
+      const cookies = res.headers['set-cookie'][0];
+      const refreshToken = cookies.split(';')[0].split('%20')[1];
+
+      const accessTokenPayload = verify(
+        accessToken,
+        CONFIG_AUTH.JWT_ACCESS,
       ) as JwtAuthPayload;
 
-      userTokens.set(tokenPayload.userId, res.body as JwtPair);
+      const refreshTokenPayload = verify(
+        refreshToken,
+        CONFIG_AUTH.JWT_REFRESH,
+      ) as JwtAuthPayload;
+
+      expect(userMap.has(accessTokenPayload.userId));
+      expect(userMap.has(refreshTokenPayload.userId));
+      expect(accessTokenPayload.userId).toEqual(refreshTokenPayload.userId);
+
+      const user = userMap.get(accessTokenPayload.userId);
+
+      expect(user.email).toEqual(dto.email);
+
+      userTokens.set(accessTokenPayload.userId, {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      });
     }
     return userTokens;
   }
 
-  public async refreshTokens(size: number = 10) {
+  public async refreshTokens(size: number = 10): Promise<void> {
     const refreshTokens = await this.createFakeDtoRefreshTokens(size);
 
     for (const refreshToken of refreshTokens) {
       const res = await request(this.app.getHttpServer())
         .get('/auth/refresh-token')
-        .set('Authorization', `Bearer ${refreshToken}`)
+        .set('Cookie', [`refreshToken=Bearer ${refreshToken}`])
         .expect(200);
 
       validateObj({ type: RefreshDtoRes, obj: res.body });
     }
   }
 
-  public async logout(size: number = 10) {
+  public async logout(size: number = 10): Promise<void> {
     const accessTokens = await this.createFakeDtoLogout(size);
 
     for (const accessToken of accessTokens) {
@@ -67,13 +95,15 @@ export class AuthenticationCase {
     }
   }
 
-  private async createFakeUsers(size: number) {
+  private async createFakeUsers(size: number): Promise<{
+    fakeUsers: User[];
+    userInputs: Map<string, string>;
+  }> {
     const usersRepository = this.app.get<Repository<User>>(
-      getRepositoryToken(User)
+      getRepositoryToken(User),
     );
     const userInputs = new Map<string, string>();
     const fakeUsers = Array.from({ length: size }, async () => {
-
       const password = faker.internet.password({ length: 16 });
       const email = faker.internet.email();
 
@@ -89,32 +119,38 @@ export class AuthenticationCase {
     });
     return {
       fakeUsers: await Promise.all(fakeUsers),
-      userInputs
-    }
+      userInputs,
+    };
   }
-  
+
   private async createFakeDtoLogout(size: number): Promise<string[]> {
     const tokens = await this.login(size);
-    return Array.from(tokens).map(val => val[1].accessToken);
+    return Array.from(tokens).map((val) => val[1].accessToken);
   }
 
   private async createFakeDtoRefreshTokens(size: number): Promise<string[]> {
     const tokens = await this.login(size);
-    return Array.from(tokens).map(val => val[1].refreshToken);
+    return Array.from(tokens).map(([_, jwtPair]) => jwtPair.refreshToken);
   }
 
-  private async createFakeDtoLogin(size: number): Promise<LoginDtoReq[]> {
+  private async createFakeDtoLogin(size: number): Promise<{
+    dtos: LoginDtoReq[];
+    fakeUsers: User[];
+  }> {
     const usersRepository = this.app.get<Repository<User>>(
-      getRepositoryToken(User)
+      getRepositoryToken(User),
     );
     const { fakeUsers, userInputs } = await this.createFakeUsers(size);
     const savedUsers = await usersRepository.save(fakeUsers);
 
-    return savedUsers.map(user => {
-      return {
-        email: user.email,
-        password: userInputs.get(user.email)
-      } as LoginDtoReq
-    });
+    return {
+      fakeUsers: savedUsers,
+      dtos: savedUsers.map((user) => {
+        return {
+          email: user.email,
+          password: userInputs.get(user.email),
+        } as LoginDtoReq;
+      }),
+    };
   }
 }

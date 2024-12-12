@@ -10,7 +10,7 @@ export class CreateDtoReq {
   public email: string;
 
   @ApiProperty({ description: 'User password' })
-  @IsStrongPassword({ 
+  @IsStrongPassword({
     minLength: 8,
     minNumbers: 0,
     minUppercase: 1,

@@ -4,9 +4,17 @@ import { hash } from 'bcrypt';
 import { User } from 'src/schema/users/user.entity';
 import { JwtService } from '../../common/jwt/jwt.service';
 import { EmailService } from '../services/email/email.service';
-import { ActivateDtoReq, CreateDtoReq, CreateDtoRes } from './dto';
+import { setCookieRefreshToken } from '../../common/utilities/utilities.cookies';
 import { CONFIG_EMAIL } from 'src/config/config.export';
 import { randomUUID } from 'crypto';
+import { Response } from 'express';
+import { IsolationLevel, Transactional } from 'typeorm-transactional';
+import {
+  ActivateDtoReq,
+  ActivateDtoRes,
+  CreateDtoReq,
+  CreateDtoRes,
+} from './dto';
 import {
   BadRequestException,
   ConflictException,
@@ -16,25 +24,23 @@ import {
 
 @Injectable()
 export class RegistrationService {
-
   @InjectRepository(User)
   private readonly usersRepository: Repository<User>;
 
   @Inject()
   private readonly jwtService: JwtService;
-  
-  @Inject()
-  private readonly emailService: EmailService
 
+  @Inject()
+  private readonly emailService: EmailService;
+
+  @Transactional({ isolationLevel: IsolationLevel.REPEATABLE_READ })
   public async createAccount(dto: CreateDtoReq): Promise<CreateDtoRes> {
     const isUserExists = await this.usersRepository.findOne({
       select: { id: true },
       where: [{ email: dto.email }],
     });
     if (isUserExists) {
-      throw new ConflictException(
-        `${dto.email} already exists!`,
-      );
+      throw new ConflictException(`${dto.email} already exists!`);
     }
     const hashPassword = await hash(dto.password, 3);
     await this.usersRepository.save({
@@ -49,7 +55,11 @@ export class RegistrationService {
     return true;
   }
 
-  public async activateAccount(dto: ActivateDtoReq): Promise<string> {
+  @Transactional({ isolationLevel: IsolationLevel.REPEATABLE_READ })
+  public async activateAccount(
+    res: Response,
+    dto: ActivateDtoReq,
+  ): Promise<ActivateDtoRes> {
     const user = await this.usersRepository.findOne({
       select: { id: true, is_active: true },
       where: { activation_link: dto.activationLink },
@@ -60,13 +70,9 @@ export class RegistrationService {
     user.is_active = true;
     await this.usersRepository.update(user.id, user);
     const tokens = await this.jwtService.createJwtTokens(user.id);
-    return this.getRedirectURL(tokens.accessToken, tokens.refreshToken);
-  }
-
-  public getRedirectURL(accessToken: string, refreshToken: string): string {
-    const redirectUrl = new URL(CONFIG_EMAIL.REDIRECT_URL);
-    redirectUrl.searchParams.append('accessToken', accessToken);
-    redirectUrl.searchParams.append('refreshToken', refreshToken);
-    return redirectUrl.toString();
+    setCookieRefreshToken(res, tokens.refreshToken);
+    return {
+      accessToken: tokens.accessToken,
+    };
   }
 }

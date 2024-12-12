@@ -6,6 +6,6 @@ import { JwtTokensDBModule } from 'src/schema/jwt-tokens/jwt.tokens.module';
 @Module({
   imports: [JwtTokensDBModule],
   providers: [JwtService],
-  exports: [JwtTokensDBModule,JwtService],
+  exports: [JwtTokensDBModule, JwtService],
 })
 export class JwtModule {}

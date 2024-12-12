@@ -1,11 +1,10 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { BaseEntity } from '../base/base.entity';
 import { JwtToken } from '../jwt-tokens/jwt.token.entity';
 import { RecoveryCode } from '../recovery-code/recovery-code.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
-
   @Column({ unique: true })
   email: string;
 
