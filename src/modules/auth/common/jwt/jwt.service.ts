@@ -21,7 +21,7 @@ export class JwtService {
     });
   }
 
-  public async deleteToken(userId: number, sessionId: string): Promise<void> {
+  public async deleteToken(sessionId: string): Promise<void> {
     await this.jwtRepository.delete({
       session_id: sessionId,
     });

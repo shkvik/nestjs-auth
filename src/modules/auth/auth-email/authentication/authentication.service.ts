@@ -43,7 +43,7 @@ export class AuthenticationService {
 
   public async logout(res: Response, jwt: JwtAuthPayload): Promise<void> {
     clearCookieRefreshToken(res);
-    await this.jwtService.deleteToken(jwt.userId, jwt.sessionId);
+    await this.jwtService.deleteToken(jwt.sessionId);
   }
 
   public async refresh(res: Response, jwt: JwtAuthPayload): Promise<RefreshDtoRes> {

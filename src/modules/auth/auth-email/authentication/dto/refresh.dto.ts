@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Allow, IsString } from 'class-validator';
-import { JwtPair } from '../../../common/jwt/interface/jwt.interface';
 
 export class RefreshDtoReq {
 

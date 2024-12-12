@@ -13,7 +13,7 @@ export class RefreshGuard extends BaseGuard implements CanActivate {
     super(jwtKey);
   }
 
-  public canActivate(context: ExecutionContext): boolean {
+  public override canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
     request['jwt'] = this.getPayload(request.cookies['refreshToken'], this.jwtKey);
     return true;
