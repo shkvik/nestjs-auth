@@ -62,7 +62,7 @@ export class RegistrationCase {
   private createFakeDtoActivate(users: User[]): ActivateDtoReq[] {
     return users.map((user) => {
       return {
-        activationLink: user.activation_link,
+        activationLink: user.activationLink,
       } as ActivateDtoReq;
     });
   }

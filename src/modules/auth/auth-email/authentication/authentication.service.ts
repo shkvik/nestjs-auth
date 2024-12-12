@@ -24,7 +24,7 @@ export class AuthenticationService {
   public async login(res: Response, dto: LoginDtoReq): Promise<LoginDtoRes> {
     const user = await this.usersRepository.findOne({
       select: { id: true, password: true },
-      where: { email: dto.email, is_active: true },
+      where: { email: dto.email, isActivated: true },
     });
     if (!user) {
       throw new BadRequestException();

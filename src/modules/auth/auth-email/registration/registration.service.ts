@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { hash } from 'bcrypt';
 import { User } from 'src/schema/users/user.entity';
 import { JwtService } from '../../common/jwt/jwt.service';
-import { EmailService } from '../services/email/email.service';
+import { EmailService } from '../provider/email.service';
 import { setCookieRefreshToken } from '../../common/utilities/utilities.cookies';
 import { CONFIG_EMAIL } from 'src/config/config.export';
 import { randomUUID } from 'crypto';
@@ -61,13 +61,13 @@ export class RegistrationService {
     dto: ActivateDtoReq,
   ): Promise<ActivateDtoRes> {
     const user = await this.usersRepository.findOne({
-      select: { id: true, is_active: true },
-      where: { activation_link: dto.activationLink },
+      select: { id: true, isActivated: true },
+      where: { activationLink: dto.activationLink },
     });
-    if (!user || user.is_active) {
+    if (!user || user.isActivated) {
       throw new BadRequestException();
     }
-    user.is_active = true;
+    user.isActivated = true;
     await this.usersRepository.update(user.id, user);
     const tokens = await this.jwtService.createJwtTokens(user.id);
     setCookieRefreshToken(res, tokens.refreshToken);

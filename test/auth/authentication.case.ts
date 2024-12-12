@@ -106,7 +106,6 @@ export class AuthenticationCase {
     const fakeUsers = Array.from({ length: size }, async () => {
       const password = faker.internet.password({ length: 16 });
       const email = faker.internet.email();
-
       userInputs.set(email, password);
 
       const hashPassword = await hash(password, 3);
@@ -114,7 +113,7 @@ export class AuthenticationCase {
       return usersRepository.create({
         email: email,
         password: hashPassword,
-        is_active: true,
+        isActivated: true,
       });
     });
     return {

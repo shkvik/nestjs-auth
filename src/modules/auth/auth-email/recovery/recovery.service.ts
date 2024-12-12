@@ -2,7 +2,6 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/schema/users/user.entity';
-import { EmailService } from '../services/email/email.service';
 import { JwtService } from '../../common/jwt/jwt.service';
 import { SendDtoReq, SendDtoRes } from './dto/send.dto';
 import { randomBytes } from 'crypto';
@@ -12,6 +11,7 @@ import { ChangeDtoReq, ChangeDtoRes } from './dto/change.dto';
 import { JwtAuthPayload } from '../../common/jwt/interface/jwt.interface';
 import { hash } from 'bcrypt';
 import { Transactional } from 'typeorm-transactional';
+import { EmailService } from '../provider/email.service';
 
 @Injectable()
 export class RecoveryService {
