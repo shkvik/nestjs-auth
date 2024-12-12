@@ -64,7 +64,6 @@ export class RecoveryService {
     const recoveryToken = await this.jwtService.getRecoveryToken(
       recoveryCode.user.id,
     );
-
     return { recoveryToken };
   }
 
@@ -87,8 +86,8 @@ export class RecoveryService {
   }
 
   private getCryptoCode(codeSize: number): string {
-    const min = 0,
-      max = 9;
+    const min = 0;
+    const max = 9;
     const code = Array.from({ length: codeSize }, () => {
       return min + ((randomBytes(1).readUInt8(0) % max) - min + 1);
     });
