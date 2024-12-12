@@ -5,7 +5,6 @@ import { AuthenticationCase } from './auth/authentication.case';
 import { RecoveryCase } from './auth/recovery.case';
 
 describe('Tests (e2e)', () => {
-
   let app: INestApplication;
   let builder: AppBuilder;
 
@@ -71,6 +70,6 @@ describe('Tests (e2e)', () => {
   });
 
   afterAll(async () => {
-    await builder.dispose()
+    await builder.dispose();
   });
 });

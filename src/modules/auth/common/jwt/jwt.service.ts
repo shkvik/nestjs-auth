@@ -8,14 +8,14 @@ import { CONFIG_AUTH } from 'src/config/config.export';
 import { randomUUID } from 'crypto';
 import { hash } from 'bcrypt';
 
-
 @Injectable()
 export class JwtService {
-
   @InjectRepository(JwtToken)
   private jwtRepository: Repository<JwtToken>;
 
-  public async findTokenByRefreshToken(refresh_token: string): Promise<JwtToken> {
+  public async findTokenByRefreshToken(
+    refresh_token: string,
+  ): Promise<JwtToken> {
     return await this.jwtRepository.findOne({
       where: { refresh_token: refresh_token },
     });
@@ -31,7 +31,7 @@ export class JwtService {
     const sessionId = randomUUID();
     const { accessToken, refreshToken } = this.generateAuthTokens({
       userId: userId,
-      sessionId: sessionId
+      sessionId: sessionId,
     });
     const hashRefreshToken = await hash(refreshToken, 3);
     await this.jwtRepository.save({
@@ -42,12 +42,15 @@ export class JwtService {
     return { accessToken, refreshToken };
   }
 
-  public async updateJwtTokens(userId: number, sessionId: string): Promise<JwtPair> {
+  public async updateJwtTokens(
+    userId: number,
+    sessionId: string,
+  ): Promise<JwtPair> {
     const token = await this.jwtRepository.findOne({
       relations: { user: true },
       where: {
         user: { id: userId },
-        session_id: sessionId
+        session_id: sessionId,
       },
     });
     if (!token) {
@@ -55,18 +58,21 @@ export class JwtService {
     }
     const { accessToken, refreshToken } = this.generateAuthTokens({
       userId: userId,
-      sessionId: sessionId
+      sessionId: sessionId,
     });
     const hashRefreshToken = await hash(refreshToken, 3);
-    await this.jwtRepository.update({ id: token.id }, {
-      refresh_token: hashRefreshToken
-    });
+    await this.jwtRepository.update(
+      { id: token.id },
+      {
+        refresh_token: hashRefreshToken,
+      },
+    );
     return { accessToken, refreshToken };
   }
 
   public async getRecoveryToken(userId: number): Promise<string> {
     return sign({ userId }, CONFIG_AUTH.JWT_RECOVERY, {
-      expiresIn: CONFIG_AUTH.JWT_RECOVERY_EXP
+      expiresIn: CONFIG_AUTH.JWT_RECOVERY_EXP,
     });
   }
 
@@ -81,10 +87,10 @@ export class JwtService {
   private generateAuthTokens(payload: JwtAuthPayload): JwtPair {
     return {
       accessToken: sign(payload, CONFIG_AUTH.JWT_ACCESS, {
-        expiresIn: CONFIG_AUTH.JWT_ACCESS_EXP
+        expiresIn: CONFIG_AUTH.JWT_ACCESS_EXP,
       }),
       refreshToken: sign(payload, CONFIG_AUTH.JWT_REFRESH, {
-        expiresIn: CONFIG_AUTH.JWT_REFRESH_EXP
+        expiresIn: CONFIG_AUTH.JWT_REFRESH_EXP,
       }),
     };
   }

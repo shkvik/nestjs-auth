@@ -7,9 +7,9 @@ import { JwtModule } from '../common/jwt/jwt.module';
 @Module({
   imports: [
     JwtModule,
-    AuthenticationModule, 
-    RecoveryModule, 
-    RegistrationModule
+    AuthenticationModule,
+    RecoveryModule,
+    RegistrationModule,
   ],
 })
 export class AuthEmailModule {}

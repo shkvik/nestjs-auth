@@ -1,7 +1,6 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class ConfigApp {
-
   @IsString()
   @IsNotEmpty()
   NODE_ENV: string;
@@ -50,11 +49,10 @@ export class ConfigAuth {
 }
 
 export class ConfigEmail {
-
   @IsString()
   @IsNotEmpty()
   ACTIVATION_LINK: string;
-  
+
   @IsString()
   @IsNotEmpty()
   REDIRECT_URL: string;

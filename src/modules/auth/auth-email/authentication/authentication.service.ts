@@ -8,14 +8,13 @@ import { LoginDtoReq, LoginDtoRes } from './dto';
 import { JwtAuthPayload } from '../../common/jwt/interface/jwt.interface';
 import { Response } from 'express';
 import { RefreshDtoRes } from './dto/refresh.dto';
-import { 
-  clearCookieRefreshToken, 
-  setCookieRefreshToken 
+import {
+  clearCookieRefreshToken,
+  setCookieRefreshToken,
 } from '../../common/utilities/utilities.cookies';
 
 @Injectable()
 export class AuthenticationService {
-
   @InjectRepository(User)
   private readonly usersRepository: Repository<User>;
 
@@ -37,8 +36,8 @@ export class AuthenticationService {
     const tokens = await this.jwtService.createJwtTokens(user.id);
     setCookieRefreshToken(res, tokens.refreshToken);
     return {
-      accessToken: tokens.accessToken
-    }
+      accessToken: tokens.accessToken,
+    };
   }
 
   public async logout(res: Response, jwt: JwtAuthPayload): Promise<void> {
@@ -46,14 +45,17 @@ export class AuthenticationService {
     await this.jwtService.deleteToken(jwt.sessionId);
   }
 
-  public async refresh(res: Response, jwt: JwtAuthPayload): Promise<RefreshDtoRes> {
+  public async refresh(
+    res: Response,
+    jwt: JwtAuthPayload,
+  ): Promise<RefreshDtoRes> {
     const tokens = await this.jwtService.updateJwtTokens(
-      jwt.userId, 
-      jwt.sessionId
+      jwt.userId,
+      jwt.sessionId,
     );
     setCookieRefreshToken(res, tokens.refreshToken);
     return {
-      accessToken: tokens.accessToken
-    }
+      accessToken: tokens.accessToken,
+    };
   }
 }

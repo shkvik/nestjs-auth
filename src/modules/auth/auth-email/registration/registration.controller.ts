@@ -3,11 +3,11 @@ import { RegistrationService } from './registration.service';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { 
-  ActivateDtoReq, 
-  ActivateDtoRes, 
+import {
+  ActivateDtoReq,
+  ActivateDtoRes,
   CreateDtoReq,
-  CreateDtoRes
+  CreateDtoRes,
 } from './dto';
 
 @Controller('auth')
@@ -28,7 +28,7 @@ export class RegistrationController {
   @ApiBody({ type: ActivateDtoReq })
   public async activateAccount(
     @Res({ passthrough: true }) res: Response,
-    @Body() dto: ActivateDtoReq
+    @Body() dto: ActivateDtoReq,
   ): Promise<ActivateDtoRes> {
     return this.registrationService.activateAccount(res, dto);
   }

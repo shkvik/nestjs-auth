@@ -1,5 +1,5 @@
-import { ConfigApp, ConfigAuth, ConfigEmail } from "./config.schema";
-import { validateEnv } from "./config.validate";
+import { ConfigApp, ConfigAuth, ConfigEmail } from './config.schema';
+import { validateEnv } from './config.validate';
 
 export const CONFIG_APP = validateEnv(ConfigApp);
 

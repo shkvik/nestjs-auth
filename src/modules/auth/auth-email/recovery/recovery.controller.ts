@@ -1,4 +1,10 @@
-import { Body, Controller, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { RecoveryService } from './recovery.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { SendDtoReq, SendDtoRes } from './dto/send.dto';
@@ -19,7 +25,7 @@ export class RecoveryController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: SendDtoReq })
   @UseInterceptors(FileInterceptor('file'))
-  public async sendCode(@Body() dto: SendDtoReq): Promise<SendDtoRes>  {
+  public async sendCode(@Body() dto: SendDtoReq): Promise<SendDtoRes> {
     return this.recoveryService.sendCode(dto);
   }
 
@@ -38,12 +44,12 @@ export class RecoveryController {
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(new BaseGuard(CONFIG_AUTH.JWT_RECOVERY))
   public async changePassword(
-    @Body() dto: ChangeDtoReq, 
-    @Jwt() jwt: JwtAuthPayload
+    @Body() dto: ChangeDtoReq,
+    @Jwt() jwt: JwtAuthPayload,
   ): Promise<ChangeDtoRes> {
-    return this.recoveryService.changePassword({ 
-      ...dto, 
-      ...jwt
+    return this.recoveryService.changePassword({
+      ...dto,
+      ...jwt,
     });
   }
 }

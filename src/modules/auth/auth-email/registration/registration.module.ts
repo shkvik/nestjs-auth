@@ -5,8 +5,8 @@ import { UsersDBModule } from 'src/schema/users/users.module';
 import { EmailModule } from '../services/email/email.module';
 
 @Module({
-  imports: [UsersDBModule,EmailModule],
+  imports: [UsersDBModule, EmailModule],
   controllers: [RegistrationController],
-  providers: [RegistrationService]
+  providers: [RegistrationService],
 })
 export class RegistrationModule {}

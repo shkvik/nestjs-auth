@@ -1,9 +1,9 @@
-import { plainToInstance } from "class-transformer";
-import { validateSync } from "class-validator";
+import { plainToInstance } from 'class-transformer';
+import { validateSync } from 'class-validator';
 
 export function validateObj<T extends object>(params: {
-  type: new (...args: any[]) => T,
-  obj: any
+  type: new (...args: any[]) => T;
+  obj: any;
 }): T {
   const { type, obj } = params;
   const validatedObj = plainToInstance(type, obj, {

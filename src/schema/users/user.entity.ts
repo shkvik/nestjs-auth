@@ -5,7 +5,6 @@ import { RecoveryCode } from '../recovery-code/recovery-code.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
-
   @Column({ unique: true })
   email: string;
 

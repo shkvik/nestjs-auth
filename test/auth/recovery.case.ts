@@ -1,31 +1,34 @@
-import { INestApplication } from "@nestjs/common";
-import { getRepositoryToken } from "@nestjs/typeorm";
-import { User } from "src/schema/users/user.entity";
-import { In, Repository } from "typeorm";
+import { INestApplication } from '@nestjs/common';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { User } from 'src/schema/users/user.entity';
+import { In, Repository } from 'typeorm';
 import * as request from 'supertest';
-import { validateObj } from "../../test/auth/utilities";
-import { RecoveryCode } from "src/schema/recovery-code/recovery-code.entity";
-import { ConfirmDtoReq, ConfirmDtoRes, SendDtoReq, SendDtoRes } from "src/modules/auth/auth-email/recovery/dto";
-import { RegistrationCase } from "./registration.case";
-
+import { validateObj } from '../../test/auth/utilities';
+import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
+import {
+  ConfirmDtoReq,
+  ConfirmDtoRes,
+  SendDtoReq,
+  SendDtoRes,
+} from 'src/modules/auth/auth-email/recovery/dto';
+import { RegistrationCase } from './registration.case';
 
 export class RecoveryCase {
+  constructor(private readonly app: INestApplication) {}
 
-  constructor(private readonly app: INestApplication) { }
-
-  public async sendCodes(size: number = 10) {
+  public async sendCodes(size: number = 10): Promise<RecoveryCode[]> {
     const recoveryCodeRepository = this.app.get<Repository<RecoveryCode>>(
-      getRepositoryToken(RecoveryCode)
+      getRepositoryToken(RecoveryCode),
     );
     const savedUsers = await this.createFakeActivatedUsers(size);
     const userIds = new Set();
 
     for (const user of savedUsers) {
       const dto: SendDtoReq = {
-        email: user.email
+        email: user.email,
       };
       userIds.add(user.id);
-      const req = request(this.app.getHttpServer()).post('/auth/send-code')
+      const req = request(this.app.getHttpServer()).post('/auth/send-code');
 
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);
@@ -35,11 +38,9 @@ export class RecoveryCase {
     }
     const codes = await recoveryCodeRepository.find({
       relations: { user: true },
-      where: { user: { id: In(savedUsers.map(user => user.id)) } },
+      where: { user: { id: In(savedUsers.map((user) => user.id)) } },
     });
-    const isCorrect = codes.every(
-      code => userIds.has(code.user.id)
-    );
+    const isCorrect = codes.every((code) => userIds.has(code.user.id));
     expect(true).toEqual(isCorrect);
 
     return codes;
@@ -47,13 +48,12 @@ export class RecoveryCase {
 
   public async confirmCode(size: number = 10): Promise<void> {
     const codes = await this.sendCodes(size);
-    const recoveryTokens: string[] = []; 
+    const recoveryTokens: string[] = [];
     for (const code of codes) {
       const dto: ConfirmDtoReq = {
-        code: code.code
+        code: code.code,
       };
-      const req = request(this.app.getHttpServer())
-        .post('/auth/confirm-code')
+      const req = request(this.app.getHttpServer()).post('/auth/confirm-code');
 
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);

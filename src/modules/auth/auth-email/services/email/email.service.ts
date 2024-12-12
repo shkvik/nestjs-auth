@@ -24,8 +24,11 @@ export class EmailService {
     });
   }
 
-  @MockMethod({ condition: () => CONFIG_APP.NODE_ENV === 'local'})
-  public async sendActivationMail(options: { to: string; link: string }): Promise<void> {
+  @MockMethod({ condition: () => CONFIG_APP.NODE_ENV === 'local' })
+  public async sendActivationMail(options: {
+    to: string;
+    link: string;
+  }): Promise<void> {
     await this.Transporter.sendMail({
       from: tmp_email,
       to: options.to,
@@ -38,9 +41,12 @@ export class EmailService {
 			`,
     });
   }
-  
-  @MockMethod({ condition: () => CONFIG_APP.NODE_ENV === 'local'})
-  public async sendRecoveryCode(options: { to: string; code: string }): Promise<void> {
+
+  @MockMethod({ condition: () => CONFIG_APP.NODE_ENV === 'local' })
+  public async sendRecoveryCode(options: {
+    to: string;
+    code: string;
+  }): Promise<void> {
     await this.Transporter.sendMail({
       from: tmp_email,
       to: options.to,

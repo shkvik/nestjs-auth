@@ -4,7 +4,6 @@ import { User } from '../users/user.entity';
 
 @Entity({ name: 'jwt_tokens' })
 export class JwtToken extends BaseEntity {
-
   @Index()
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
