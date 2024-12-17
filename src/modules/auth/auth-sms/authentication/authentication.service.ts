@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { User } from 'src/schema/users/user.entity';
 import { SendDtoReq, SendDtoRes } from './dto/send.dto';
 import { ConfirmDtoReq, ConfirmDtoRes } from './dto/confirm.dto';
-import { randomBytes } from 'crypto';
 import { RefreshDtoRes } from './dto/refresh.dto';
 import { Response } from 'express';
 import { Transactional } from 'typeorm-transactional';
@@ -13,6 +12,7 @@ import { UcallerService } from '../provider/ucaller.service';
 import { JwtService } from '../../common/jwt/jwt.service';
 import { setCookieRefreshToken } from '../../common/utilities/utilities.cookies';
 import { JwtAuthPayload } from '../../common/jwt/interface/jwt.interface';
+import { getCryptoCode } from '../../common/utilities/crypto-code';
 
 @Injectable()
 export class AuthenticationService {
@@ -45,7 +45,7 @@ export class AuthenticationService {
       phone: phone,
       isActive: false,
     });
-    const secrectCode = this.getCryptoCode(4);
+    const secrectCode = getCryptoCode(4);
     await this.authCodeRep.save({
       code: secrectCode,
       user: { id: user.id },
@@ -96,14 +96,5 @@ export class AuthenticationService {
 
     setCookieRefreshToken(res, refreshToken);
     return { accessToken };
-  }
-
-  private getCryptoCode(codeSize: number): string {
-    const min = 0,
-      max = 9;
-    const code = Array.from({ length: codeSize }, () => {
-      return min + ((randomBytes(1).readUInt8(0) % max) - min + 1);
-    });
-    return code.join('');
   }
 }

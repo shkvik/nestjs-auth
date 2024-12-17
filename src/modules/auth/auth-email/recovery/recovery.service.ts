@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/schema/users/user.entity';
 import { JwtService } from '../../common/jwt/jwt.service';
 import { SendDtoReq, SendDtoRes } from './dto/send.dto';
-import { randomBytes } from 'crypto';
+import { getCryptoCode } from '../../common/utilities/crypto-code';
 import { ConfirmDtoReq, ConfirmDtoRes } from './dto/confirm.dto';
 import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
 import { ChangeDtoReq, ChangeDtoRes } from './dto/change.dto';
@@ -38,7 +38,7 @@ export class RecoveryService {
     if (!user || user.recoveryCode) {
       throw new BadRequestException();
     }
-    const code = this.getCryptoCode(6);
+    const code = getCryptoCode(6);
     await this.recoveryCodeRepository.save({ code, user });
     await this.emailService.sendRecoveryCode({
       to: dto.email,
@@ -83,14 +83,5 @@ export class RecoveryService {
       password: hashPassword,
     });
     return this.jwtService.createJwtTokens(dto.userId);
-  }
-
-  private getCryptoCode(codeSize: number): string {
-    const min = 0;
-    const max = 9;
-    const code = Array.from({ length: codeSize }, () => {
-      return min + ((randomBytes(1).readUInt8(0) % max) - min + 1);
-    });
-    return code.join('');
   }
 }
