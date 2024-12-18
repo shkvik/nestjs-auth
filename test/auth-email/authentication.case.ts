@@ -7,7 +7,7 @@ import * as request from 'supertest';
 import { verify } from 'jsonwebtoken';
 import { CONFIG_AUTH } from 'src/config/config.export';
 import { hash } from 'bcrypt';
-import { validateObj } from '../../test/auth/utilities';
+import { validateObj } from './utilities';
 import {
   JwtAuthPayload,
   JwtPair,
@@ -29,7 +29,7 @@ export class AuthenticationCase {
     );
 
     for (const dto of dtos) {
-      const req = request(this.app.getHttpServer()).post('/auth/login');
+      const req = request(this.app.getHttpServer()).post('/auth-email/login');
 
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);
@@ -74,7 +74,7 @@ export class AuthenticationCase {
 
     for (const refreshToken of refreshTokens) {
       const res = await request(this.app.getHttpServer())
-        .get('/auth/refresh-token')
+        .get('/auth-email/refresh-token')
         .set('Cookie', [`refreshToken=Bearer ${refreshToken}`])
         .expect(200);
 
@@ -87,7 +87,7 @@ export class AuthenticationCase {
 
     for (const accessToken of accessTokens) {
       const res = await request(this.app.getHttpServer())
-        .get('/auth/logout')
+        .get('/auth-email/logout')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
@@ -106,7 +106,6 @@ export class AuthenticationCase {
     const fakeUsers = Array.from({ length: size }, async () => {
       const password = faker.internet.password({ length: 16 });
       const email = faker.internet.email();
-
       userInputs.set(email, password);
 
       const hashPassword = await hash(password, 3);
@@ -114,7 +113,7 @@ export class AuthenticationCase {
       return usersRepository.create({
         email: email,
         password: hashPassword,
-        is_active: true,
+        isActivated: true,
       });
     });
     return {

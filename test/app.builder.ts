@@ -2,7 +2,6 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppModule } from 'src/modules/app/app.module';
-import { EmailService } from 'src/modules/auth/auth-email/services/email/email.service';
 import { dataSourceUserOption } from 'src/schema/datasource';
 import { JwtToken } from 'src/schema/jwt-tokens/jwt.token.entity';
 import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
@@ -10,6 +9,7 @@ import { User } from 'src/schema/users/user.entity';
 import { DataSource, QueryRunner } from 'typeorm';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 import * as cookieParser from 'cookie-parser';
+import { EmailService } from 'src/modules/auth/auth-email/provider/email.service';
 
 export class AppBuilder {
   private app: INestApplication;

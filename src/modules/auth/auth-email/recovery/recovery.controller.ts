@@ -16,8 +16,8 @@ import { Jwt } from '../../common/jwt/jwt.decorator';
 import { JwtAuthPayload } from '../../common/jwt/interface/jwt.interface';
 import { ChangeDtoReq, ChangeDtoRes } from './dto/change.dto';
 
-@Controller('auth')
-@ApiTags('Auth')
+@Controller('auth-email')
+@ApiTags('Auth Email')
 export class RecoveryController {
   constructor(private readonly recoveryService: RecoveryService) {}
 

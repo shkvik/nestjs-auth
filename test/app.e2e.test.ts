@@ -1,8 +1,8 @@
 import { INestApplication } from '@nestjs/common';
 import { AppBuilder } from './app.builder';
-import { RegistrationCase } from './auth/registration.case';
-import { AuthenticationCase } from './auth/authentication.case';
-import { RecoveryCase } from './auth/recovery.case';
+import { RegistrationCase } from './auth-email/registration.case';
+import { AuthenticationCase } from './auth-email/authentication.case';
+import { RecoveryCase } from './auth-email/recovery.case';
 
 describe('Tests (e2e)', () => {
   let app: INestApplication;

@@ -10,8 +10,8 @@ import {
   CreateDtoRes,
 } from './dto';
 
-@Controller('auth')
-@ApiTags('Auth')
+@Controller('auth-email')
+@ApiTags('Auth Email')
 export class RegistrationController {
   constructor(private readonly registrationService: RegistrationService) {}
 

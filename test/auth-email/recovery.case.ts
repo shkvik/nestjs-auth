@@ -3,15 +3,15 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from 'src/schema/users/user.entity';
 import { In, Repository } from 'typeorm';
 import * as request from 'supertest';
-import { validateObj } from '../../test/auth/utilities';
+import { validateObj } from './utilities';
 import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
+import { RegistrationCase } from './registration.case';
 import {
   ConfirmDtoReq,
   ConfirmDtoRes,
   SendDtoReq,
   SendDtoRes,
 } from 'src/modules/auth/auth-email/recovery/dto';
-import { RegistrationCase } from './registration.case';
 
 export class RecoveryCase {
   constructor(private readonly app: INestApplication) {}
@@ -28,7 +28,7 @@ export class RecoveryCase {
         email: user.email,
       };
       userIds.add(user.id);
-      const req = request(this.app.getHttpServer()).post('/auth/send-code');
+      const req = request(this.app.getHttpServer()).post('/auth-email/send-code');
 
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);
@@ -53,7 +53,7 @@ export class RecoveryCase {
       const dto: ConfirmDtoReq = {
         code: code.code,
       };
-      const req = request(this.app.getHttpServer()).post('/auth/confirm-code');
+      const req = request(this.app.getHttpServer()).post('/auth-email/confirm-code');
 
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);

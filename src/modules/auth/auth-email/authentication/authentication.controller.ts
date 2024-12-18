@@ -20,8 +20,8 @@ import { RefreshDtoRes } from './dto/refresh.dto';
 import { Response } from 'express';
 import { RefreshGuard } from 'src/guards/refresh.guard';
 
-@Controller('auth')
-@ApiTags('Auth')
+@Controller('auth-email')
+@ApiTags('Auth Email')
 export class AuthenticationController {
   @Inject()
   private readonly authenticationService: AuthenticationService;
