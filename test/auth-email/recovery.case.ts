@@ -28,7 +28,7 @@ export class RecoveryCase {
         email: user.email,
       };
       userIds.add(user.id);
-      const req = request(this.app.getHttpServer()).post('/auth/send-code');
+      const req = request(this.app.getHttpServer()).post('/auth-email/send-code');
 
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);
@@ -53,7 +53,7 @@ export class RecoveryCase {
       const dto: ConfirmDtoReq = {
         code: code.code,
       };
-      const req = request(this.app.getHttpServer()).post('/auth/confirm-code');
+      const req = request(this.app.getHttpServer()).post('/auth-email/confirm-code');
 
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);

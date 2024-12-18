@@ -29,7 +29,7 @@ export class AuthenticationCase {
     );
 
     for (const dto of dtos) {
-      const req = request(this.app.getHttpServer()).post('/auth/login');
+      const req = request(this.app.getHttpServer()).post('/auth-email/login');
 
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);
@@ -74,7 +74,7 @@ export class AuthenticationCase {
 
     for (const refreshToken of refreshTokens) {
       const res = await request(this.app.getHttpServer())
-        .get('/auth/refresh-token')
+        .get('/auth-email/refresh-token')
         .set('Cookie', [`refreshToken=Bearer ${refreshToken}`])
         .expect(200);
 
@@ -87,7 +87,7 @@ export class AuthenticationCase {
 
     for (const accessToken of accessTokens) {
       const res = await request(this.app.getHttpServer())
-        .get('/auth/logout')
+        .get('/auth-email/logout')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
