@@ -7,7 +7,7 @@ import * as request from 'supertest';
 import { verify } from 'jsonwebtoken';
 import { CONFIG_AUTH } from 'src/config/config.export';
 import { hash } from 'bcrypt';
-import { validateObj } from '../../test/auth/utilities';
+import { validateObj } from './utilities';
 import {
   JwtAuthPayload,
   JwtPair,

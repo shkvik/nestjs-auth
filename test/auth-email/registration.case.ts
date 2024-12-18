@@ -1,13 +1,13 @@
 import { faker } from '@faker-js/faker/.';
 import { INestApplication } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import * as request from 'supertest';
+import { User } from 'src/schema/users/user.entity';
+import { In, Repository } from 'typeorm';
 import {
   ActivateDtoReq,
   CreateDtoReq,
 } from 'src/modules/auth/auth-email/registration/dto';
-import { User } from 'src/schema/users/user.entity';
-import { In, Repository } from 'typeorm';
-import * as request from 'supertest';
 
 export class RegistrationCase {
   constructor(private readonly app: INestApplication) {}
@@ -19,7 +19,7 @@ export class RegistrationCase {
     );
     for (const dto of dtos) {
       const req = request(this.app.getHttpServer()).post(
-        '/auth/create-account',
+        '/auth-email/create-account',
       );
 
       for (const [key, value] of Object.entries(dto)) {
@@ -44,7 +44,7 @@ export class RegistrationCase {
     );
     for (const dto of dtos) {
       await request(this.app.getHttpServer())
-        .post('/auth/activate-account')
+        .post('/auth-email/activate-account')
         .field('activationLink', dto.activationLink)
         .expect(201);
     }

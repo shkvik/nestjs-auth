@@ -46,7 +46,7 @@ export class RegistrationService {
     await this.usersRepository.save({
       email: dto.email,
       password: hashPassword,
-      activation_link: randomUUID(),
+      activationLink: randomUUID(),
     });
     await this.emailService.sendActivationMail({
       to: dto.email,

@@ -3,15 +3,15 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from 'src/schema/users/user.entity';
 import { In, Repository } from 'typeorm';
 import * as request from 'supertest';
-import { validateObj } from '../../test/auth/utilities';
+import { validateObj } from './utilities';
 import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
+import { RegistrationCase } from './registration.case';
 import {
   ConfirmDtoReq,
   ConfirmDtoRes,
   SendDtoReq,
   SendDtoRes,
 } from 'src/modules/auth/auth-email/recovery/dto';
-import { RegistrationCase } from './registration.case';
 
 export class RecoveryCase {
   constructor(private readonly app: INestApplication) {}
