@@ -5,9 +5,9 @@ import * as request from 'supertest';
 import { User } from 'src/schema/users/user.entity';
 import { In, Repository } from 'typeorm';
 import {
-  ActivateDtoReq,
-  CreateDtoReq,
-} from 'src/modules/auth/auth-email/registration/dto';
+  ActivateAccountDtoReq,
+  CreateAccountDtoReq,
+} from 'src/modules/auth/registration/dto';
 
 export class AuthEmailRegistrationCase {
   constructor(private readonly app: INestApplication) {}
@@ -23,7 +23,6 @@ export class AuthEmailRegistrationCase {
       );
 
       for (const [key, value] of Object.entries(dto)) {
-        //@ts-ignore
         req.field(key, value);
       }
       await req.expect(201);
@@ -46,7 +45,7 @@ export class AuthEmailRegistrationCase {
     for (const dto of dtos) {
       await request(this.app.getHttpServer())
         .post('/auth-email/activate-account')
-        .field('activationLink', dto.activationLink)
+        .field('activationLink', dto.code)
         .expect(201);
     }
     const activatedUsers = await usersRepository.find({
@@ -60,20 +59,20 @@ export class AuthEmailRegistrationCase {
     return activatedUsers;
   }
 
-  private createFakeDtoActivate(users: User[]): ActivateDtoReq[] {
+  private createFakeDtoActivate(users: User[]): ActivateAccountDtoReq[] {
     return users.map((user) => {
       return {
-        activationLink: user.activationLink,
-      } as ActivateDtoReq;
+        code: user.activationLink,
+      } as ActivateAccountDtoReq;
     });
   }
 
-  private createFakeDtoCreate(size: number): CreateDtoReq[] {
+  private createFakeDtoCreate(size: number): CreateAccountDtoReq[] {
     const fakeDtoes = Array.from({ length: size }, () => {
       return {
         email: faker.internet.email(),
         password: faker.internet.password({ length: 16 }),
-      } as CreateDtoReq;
+      } as CreateAccountDtoReq;
     });
 
     return fakeDtoes;

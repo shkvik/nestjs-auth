@@ -1,9 +1,9 @@
 import { INestApplication } from '@nestjs/common';
 import { AppBuilder } from './app.builder';
-import { 
-  AuthEmailAuthenticationCase, 
-  AuthEmailRecoveryCase, 
-  AuthEmailRegistrationCase 
+import {
+  AuthEmailAuthenticationCase,
+  AuthEmailRecoveryCase,
+  AuthEmailRegistrationCase,
 } from './auth-email';
 
 describe('Tests (e2e)', () => {

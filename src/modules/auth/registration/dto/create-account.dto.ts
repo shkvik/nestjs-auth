@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { 
-  IsStrongPassword, 
-  IsEmail, 
-  IsPhoneNumber, 
-  ValidateIf 
+import {
+  IsStrongPassword,
+  IsEmail,
+  IsPhoneNumber,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreateAccountDtoReq {
@@ -27,7 +27,7 @@ export class CreateAccountDtoReq {
   @ValidateIf((o: CreateAccountDtoReq) => !o.email)
   public phone?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User password',
     example: 'Qwerty!1',
   })

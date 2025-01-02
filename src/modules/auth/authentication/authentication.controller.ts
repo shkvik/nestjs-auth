@@ -23,7 +23,6 @@ import { AuthenticationService } from './authentication.service';
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthenticationController {
-
   @Inject()
   private readonly authenticationService: AuthenticationService;
 
@@ -48,19 +47,14 @@ export class AuthenticationController {
     return this.authenticationService.logout(res, jwt);
   }
 
+  /**
+   * TODO
+   */
   @Post('2fa-totp')
   @ApiBody({ type: LoginDtoReq })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
-  public async twoFactorTOTP(
-    //@ts-ignore
-    @Res({ passthrough: true }) res: Response,
-    //@ts-ignore
-    @Body() dto: LoginDtoReq,
-    //@ts-ignore
-  ): Promise<LoginDtoRes> {
-    //return this.authenticationService.login(res, dto);
-  }
+  public async twoFactorTOTP(): Promise<void> {}
 
   @Get('validate-token')
   @ApiBearerAuth()

@@ -15,11 +15,11 @@ import { setCookieRefreshToken } from '../utilities/utilities.cookies';
 import { getCryptoCode } from '../utilities/crypto-code';
 import { AuthCode } from 'src/schema/auth-code/auth-code.entity';
 import { EmailService, PhoneService } from '../providers';
-import { 
-  ActivateAccountDtoReq, 
-  ActivateAccountDtoRes, 
-  CreateAccountDtoReq, 
-  CreateAccountDtoRes 
+import {
+  ActivateAccountDtoReq,
+  ActivateAccountDtoRes,
+  CreateAccountDtoReq,
+  CreateAccountDtoRes,
 } from './dto';
 
 @Injectable()
@@ -40,15 +40,14 @@ export class RegistrationService {
   private readonly authCodeRep: Repository<AuthCode>;
 
   @Transactional({ isolationLevel: IsolationLevel.REPEATABLE_READ })
-  public async createAccount(dto: CreateAccountDtoReq): Promise<CreateAccountDtoRes> {
+  public async createAccount(
+    dto: CreateAccountDtoReq,
+  ): Promise<CreateAccountDtoRes> {
     let user = await this.userRep.findOne({
       relationLoadStrategy: 'join',
       relations: { authCode: true },
       select: { id: true },
-      where: [
-        { email: dto.email },
-        { phone: dto.phone }
-      ],
+      where: [{ email: dto.email }, { phone: dto.phone }],
     });
     if (user && user.authCode) {
       throw new ConflictException();

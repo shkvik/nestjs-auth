@@ -9,13 +9,13 @@ import { JwtService } from '../jwt/jwt.service';
 import { EmailService, PhoneService } from '../providers';
 import { getCryptoCode } from '../utilities/crypto-code';
 import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
-import { 
+import {
   ChangePasswordDtoReq,
   ChangePasswordDtoRes,
   ConfirmRecoveryCodeDtoReq,
   ConfirmRecoveryCodeDtoRes,
-  SendRecoveryCodeDtoReq, 
-  SendRecoveryCodeDtoRes 
+  SendRecoveryCodeDtoReq,
+  SendRecoveryCodeDtoRes,
 } from './dto';
 
 @Injectable()
@@ -37,15 +37,12 @@ export class RecoveryService {
 
   @Transactional({ isolationLevel: IsolationLevel.REPEATABLE_READ })
   public async sendRecoveryCode(
-    dto: SendRecoveryCodeDtoReq
+    dto: SendRecoveryCodeDtoReq,
   ): Promise<SendRecoveryCodeDtoRes> {
     const user = await this.userRep.findOne({
       relationLoadStrategy: 'join',
       relations: { recoveryCode: true },
-      where: [
-        { email: dto.email },
-        { phone: dto.phone }
-      ],
+      where: [{ email: dto.email }, { phone: dto.phone }],
     });
     if (!user || user.recoveryCode) {
       throw new BadRequestException();
@@ -73,7 +70,7 @@ export class RecoveryService {
 
   @Transactional({ isolationLevel: IsolationLevel.REPEATABLE_READ })
   public async confirmCode(
-    dto: ConfirmRecoveryCodeDtoReq
+    dto: ConfirmRecoveryCodeDtoReq,
   ): Promise<ConfirmRecoveryCodeDtoRes> {
     const recoveryCode = await this.recoveryCodeRep.findOne({
       relations: { user: true },

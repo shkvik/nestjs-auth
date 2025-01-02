@@ -1,19 +1,25 @@
-import { Body, Controller, Inject, Post, Res, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Inject,
+  Post,
+  Res,
+  UseInterceptors,
+} from '@nestjs/common';
 import { RegistrationService } from './registration.service';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
-  CreateAccountDtoReq, 
+  CreateAccountDtoReq,
   CreateAccountDtoRes,
-  ActivateAccountDtoReq, 
-  ActivateAccountDtoRes, 
+  ActivateAccountDtoReq,
+  ActivateAccountDtoRes,
 } from './dto';
 
 @Controller('auth')
 @ApiTags('Auth')
 export class RegistrationController {
-
   @Inject()
   private readonly registrationService: RegistrationService;
 
@@ -21,7 +27,9 @@ export class RegistrationController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateAccountDtoReq })
   @UseInterceptors(FileInterceptor('file'))
-  public async createAccount(@Body() dto: CreateAccountDtoReq): Promise<CreateAccountDtoRes> {
+  public async createAccount(
+    @Body() dto: CreateAccountDtoReq,
+  ): Promise<CreateAccountDtoRes> {
     return this.registrationService.createAccount(dto);
   }
 

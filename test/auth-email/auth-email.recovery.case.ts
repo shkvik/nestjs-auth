@@ -28,7 +28,9 @@ export class AuthEmailRecoveryCase {
         email: user.email,
       };
       userIds.add(user.id);
-      const req = request(this.app.getHttpServer()).post('/auth-email/send-code');
+      const req = request(this.app.getHttpServer()).post(
+        '/auth-email/send-code',
+      );
 
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);
@@ -53,7 +55,9 @@ export class AuthEmailRecoveryCase {
       const dto: ConfirmDtoReq = {
         code: code.code,
       };
-      const req = request(this.app.getHttpServer()).post('/auth-email/confirm-code');
+      const req = request(this.app.getHttpServer()).post(
+        '/auth-email/confirm-code',
+      );
 
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);

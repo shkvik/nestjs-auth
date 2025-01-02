@@ -6,7 +6,10 @@ import { compare } from 'bcrypt';
 import { LoginDtoReq, LoginDtoRes } from './dto';
 import { Response } from 'express';
 import { RefreshDtoRes } from './dto/refresh.dto';
-import { clearCookieRefreshToken, setCookieRefreshToken } from '../utilities/utilities.cookies';
+import {
+  clearCookieRefreshToken,
+  setCookieRefreshToken,
+} from '../utilities/utilities.cookies';
 import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
 import { JwtService } from '../jwt/jwt.service';
 
@@ -22,7 +25,7 @@ export class AuthenticationService {
     const user = await this.usersRep.findOne({
       select: { id: true, password: true },
       where: {
-        isActivated: true, 
+        isActivated: true,
         email: dto.email,
         phone: dto.phone,
       },

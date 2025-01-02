@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsString, IsEmail, ValidateIf, IsPhoneNumber, IsNotEmpty } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  ValidateIf,
+  IsPhoneNumber,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class LoginDtoReq {
   @ApiProperty({

@@ -8,12 +8,9 @@ import { AuthCode } from 'src/schema/auth-code/auth-code.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      User, 
-      AuthCode
-    ]), 
-    EmailModule, 
-    PhoneModule
+    TypeOrmModule.forFeature([User, AuthCode]),
+    EmailModule,
+    PhoneModule,
   ],
   controllers: [RegistrationController],
   providers: [RegistrationService],
