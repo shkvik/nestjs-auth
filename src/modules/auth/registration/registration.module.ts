@@ -3,8 +3,8 @@ import { RegistrationController } from './registration.controller';
 import { RegistrationService } from './registration.service';
 import { EmailModule, PhoneModule } from '../providers';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/schema/users/user.entity';
-import { AuthCode } from 'src/schema/auth-code/auth-code.entity';
+import { User } from 'src/db/entities/user.entity';
+import { AuthCode } from 'src/db/entities/auth-code.entity';
 
 @Module({
   imports: [

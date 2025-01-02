@@ -1,11 +1,12 @@
 import { Global, Module } from '@nestjs/common';
 import { JwtService } from './jwt.service';
-import { JwtTokensDBModule } from 'src/schema/jwt-tokens/jwt.tokens.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtToken } from 'src/db/entities/jwt.token.entity';
 
 @Global()
 @Module({
-  imports: [JwtTokensDBModule],
+  imports: [TypeOrmModule.forFeature([JwtToken])],
   providers: [JwtService],
-  exports: [JwtTokensDBModule, JwtService],
+  exports: [TypeOrmModule, JwtService],
 })
 export class JwtModule {}

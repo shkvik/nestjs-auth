@@ -1,8 +1,8 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/schema/users/user.entity';
-import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
+import { User } from 'src/db/entities/user.entity';
+import { RecoveryCode } from 'src/db/entities/recovery-code.entity';
 import { hash } from 'bcrypt';
 import { IsolationLevel, Transactional } from 'typeorm-transactional';
 import { JwtService } from '../jwt/jwt.service';

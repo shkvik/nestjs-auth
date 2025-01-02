@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { DataSourceOptions } from 'typeorm';
-import { CONFIG_DB } from './shema.config';
+import { CONFIG_DB } from './db.config';
 import { config } from 'dotenv';
 
 config();

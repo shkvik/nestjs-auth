@@ -7,13 +7,13 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { hash } from 'bcrypt';
-import { User } from 'src/schema/users/user.entity';
+import { User } from 'src/db/entities/user.entity';
 import { JwtService } from '../jwt/jwt.service';
 import { Response } from 'express';
 import { IsolationLevel, Transactional } from 'typeorm-transactional';
 import { setCookieRefreshToken } from '../utilities/utilities.cookies';
 import { getCryptoCode } from '../utilities/crypto-code';
-import { AuthCode } from 'src/schema/auth-code/auth-code.entity';
+import { AuthCode } from 'src/db/entities/auth-code.entity';
 import { EmailService, PhoneService } from '../providers';
 import {
   ActivateAccountDtoReq,

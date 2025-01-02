@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
-import { BaseEntity } from '../base/base.entity';
-import { User } from '../users/user.entity';
+import { BaseEntity } from '../entities/base.entity';
+import { User } from '../entities/user.entity';
 
 @Entity({ name: 'auth_codes' })
 export class AuthCode extends BaseEntity {

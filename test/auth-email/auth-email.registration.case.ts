@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker/.';
 import { INestApplication } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
-import { User } from 'src/schema/users/user.entity';
+import { User } from 'src/db/entities/user.entity';
 import { In, Repository } from 'typeorm';
 import {
   ActivateAccountDtoReq,

@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtPayload, sign, verify } from 'jsonwebtoken';
-import { JwtToken } from 'src/schema/jwt-tokens/jwt.token.entity';
+import { JwtToken } from 'src/db/entities/jwt.token.entity';
 import { JwtAuthPayload, JwtPair } from './interface/jwt.interface';
 import { CONFIG_AUTH } from 'src/config/config.export';
 import { randomUUID } from 'crypto';

@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
-import { BaseEntity } from '../base/base.entity';
-import { User } from '../users/user.entity';
+import { BaseEntity } from './base.entity';
+import { User } from './user.entity';
 
 @Entity({ name: 'jwt_tokens' })
 export class JwtToken extends BaseEntity {

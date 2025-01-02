@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
-import { BaseEntity } from '../base/base.entity';
-import { User } from '../users/user.entity';
+import { BaseEntity } from './base.entity';
+import { User } from './user.entity';
 
 @Entity({ name: 'recovery_code' })
 export class RecoveryCode extends BaseEntity {

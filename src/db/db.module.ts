@@ -1,17 +1,11 @@
 import { Module } from '@nestjs/common';
-import { JwtTokensDBModule } from './jwt-tokens/jwt.tokens.module';
-import { UsersDBModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceUserOption } from './datasource';
-import { RecoveryCodeDBModule } from './recovery-code/recovery-code.module';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 import { DataSource } from 'typeorm';
 
 @Module({
   imports: [
-    JwtTokensDBModule,
-    UsersDBModule,
-    RecoveryCodeDBModule,
     TypeOrmModule.forRootAsync({
       useFactory: async () => dataSourceUserOption,
       dataSourceFactory: async (options) => {
@@ -24,4 +18,4 @@ import { DataSource } from 'typeorm';
   ],
   exports: [TypeOrmModule],
 })
-export class SchemaModule {}
+export class DBModule {}

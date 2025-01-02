@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker/.';
 import { INestApplication } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from 'src/schema/users/user.entity';
+import { User } from 'src/db/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as request from 'supertest';
 import { verify } from 'jsonwebtoken';

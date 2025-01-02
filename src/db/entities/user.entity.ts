@@ -1,8 +1,8 @@
 import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
-import { BaseEntity } from '../base/base.entity';
-import { JwtToken } from '../jwt-tokens/jwt.token.entity';
-import { RecoveryCode } from '../recovery-code/recovery-code.entity';
-import { AuthCode } from '../auth-code/auth-code.entity';
+import { BaseEntity } from './base.entity';
+import { JwtToken } from './jwt.token.entity';
+import { RecoveryCode } from './recovery-code.entity';
+import { AuthCode } from './auth-code.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {

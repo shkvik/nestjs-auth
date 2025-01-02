@@ -1,10 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from 'src/schema/users/user.entity';
+import { User } from 'src/db/entities/user.entity';
 import { In, Repository } from 'typeorm';
 import * as request from 'supertest';
 import { validateObj } from '../utilities';
-import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
+import { RecoveryCode } from 'src/db/entities/recovery-code.entity';
 import { AuthEmailRegistrationCase } from './auth-email.registration.case';
 import {
   ConfirmDtoReq,
