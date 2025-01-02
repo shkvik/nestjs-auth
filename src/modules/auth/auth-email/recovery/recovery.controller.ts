@@ -12,8 +12,8 @@ import { ConfirmDtoReq, ConfirmDtoRes } from './dto/confirm.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BaseGuard } from 'src/guards/base.guard';
 import { CONFIG_AUTH } from 'src/config/config.export';
-import { Jwt } from '../../common/jwt/jwt.decorator';
-import { JwtAuthPayload } from '../../common/jwt/interface/jwt.interface';
+import { Jwt } from '../../jwt/jwt.decorator';
+import { JwtAuthPayload } from '../../jwt/interface/jwt.interface';
 import { ChangeDtoReq, ChangeDtoRes } from './dto/change.dto';
 
 @Controller('auth-email')

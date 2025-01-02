@@ -3,9 +3,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from 'src/schema/users/user.entity';
 import { In, Repository } from 'typeorm';
 import * as request from 'supertest';
-import { validateObj } from './utilities';
+import { validateObj } from '../utilities';
 import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
-import { RegistrationCase } from './registration.case';
+import { AuthEmailRegistrationCase } from './auth-email.registration.case';
 import {
   ConfirmDtoReq,
   ConfirmDtoRes,
@@ -13,7 +13,7 @@ import {
   SendDtoRes,
 } from 'src/modules/auth/auth-email/recovery/dto';
 
-export class RecoveryCase {
+export class AuthEmailRecoveryCase {
   constructor(private readonly app: INestApplication) {}
 
   public async sendCodes(size: number = 10): Promise<RecoveryCode[]> {
@@ -65,6 +65,6 @@ export class RecoveryCase {
   }
 
   private async createFakeActivatedUsers(size: number): Promise<User[]> {
-    return new RegistrationCase(this.app).activateAccounts(size);
+    return new AuthEmailRegistrationCase(this.app).activateAccounts(size);
   }
 }

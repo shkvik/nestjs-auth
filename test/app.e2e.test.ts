@@ -1,8 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import { AppBuilder } from './app.builder';
-import { RegistrationCase } from './auth-email/registration.case';
-import { AuthenticationCase } from './auth-email/authentication.case';
-import { RecoveryCase } from './auth-email/recovery.case';
+import { 
+  AuthEmailAuthenticationCase, 
+  AuthEmailRecoveryCase, 
+  AuthEmailRegistrationCase 
+} from './auth-email';
 
 describe('Tests (e2e)', () => {
   let app: INestApplication;
@@ -14,9 +16,9 @@ describe('Tests (e2e)', () => {
   });
 
   describe('Registration', () => {
-    let cases: RegistrationCase;
+    let cases: AuthEmailRegistrationCase;
     beforeAll(() => {
-      cases = new RegistrationCase(app);
+      cases = new AuthEmailRegistrationCase(app);
     });
     it('Create accounts', async () => {
       await cases.createAccounts();
@@ -26,10 +28,10 @@ describe('Tests (e2e)', () => {
     });
   });
   describe('Authentication', () => {
-    let cases: AuthenticationCase;
+    let cases: AuthEmailAuthenticationCase;
 
     beforeAll(async () => {
-      cases = new AuthenticationCase(app);
+      cases = new AuthEmailAuthenticationCase(app);
     });
     it('Login', async () => {
       await cases.login();
@@ -42,10 +44,10 @@ describe('Tests (e2e)', () => {
     });
   });
   describe('Recovery', () => {
-    let cases: RecoveryCase;
+    let cases: AuthEmailRecoveryCase;
 
     beforeAll(async () => {
-      cases = new RecoveryCase(app);
+      cases = new AuthEmailRecoveryCase(app);
     });
     it('Send Code', async () => {
       await cases.sendCodes();

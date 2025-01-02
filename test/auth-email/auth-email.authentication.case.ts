@@ -7,18 +7,18 @@ import * as request from 'supertest';
 import { verify } from 'jsonwebtoken';
 import { CONFIG_AUTH } from 'src/config/config.export';
 import { hash } from 'bcrypt';
-import { validateObj } from './utilities';
+import { validateObj } from '../utilities';
 import {
   JwtAuthPayload,
   JwtPair,
-} from 'src/modules/auth/common/jwt/interface/jwt.interface';
+} from 'src/modules/auth/jwt/interface/jwt.interface';
 import {
   LoginDtoReq,
   LoginDtoRes,
   RefreshDtoRes,
 } from 'src/modules/auth/auth-email/authentication/dto';
 
-export class AuthenticationCase {
+export class AuthEmailAuthenticationCase {
   constructor(private readonly app: INestApplication) {}
 
   public async login(size: number = 10): Promise<Map<number, JwtPair>> {

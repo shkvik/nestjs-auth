@@ -13,14 +13,6 @@ export class JwtService {
   @InjectRepository(JwtToken)
   private jwtRepository: Repository<JwtToken>;
 
-  public async findTokenByRefreshToken(
-    refresh_token: string,
-  ): Promise<JwtToken> {
-    return await this.jwtRepository.findOne({
-      where: { refresh_token: refresh_token },
-    });
-  }
-
   public async deleteToken(sessionId: string): Promise<void> {
     await this.jwtRepository.delete({
       session_id: sessionId,

@@ -1,27 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsStrongPassword, IsEmail, IsOptional, IsPhoneNumber } from 'class-validator';
+import { 
+  IsStrongPassword, 
+  IsEmail, 
+  IsPhoneNumber, 
+  ValidateIf 
+} from 'class-validator';
 
-export class CreateDtoReq {
+export class CreateAccountDtoReq {
   @ApiProperty({
     required: false,
     description: 'Email address of the user',
     example: 'example@email.com',
   })
   @IsEmail()
-  @IsOptional()
+  @ValidateIf((o: CreateAccountDtoReq) => !o.phone)
   public email?: string;
 
   @ApiProperty({
+    required: false,
     description: 'User phone',
-    example: '+7(999) 555 22 11',
+    example: '+7(999) 555-22-11',
   })
   @IsPhoneNumber()
-  @IsOptional()
   @Transform(({ value }) => value.replace(/\D/g, ''))
+  @ValidateIf((o: CreateAccountDtoReq) => !o.email)
   public phone?: string;
 
-  @ApiProperty({ description: 'User password' })
+  @ApiProperty({ 
+    description: 'User password',
+    example: 'Qwerty!1',
+  })
   @IsStrongPassword({
     minLength: 8,
     minNumbers: 0,
@@ -32,4 +41,4 @@ export class CreateDtoReq {
   public password: string;
 }
 
-export type CreateDtoRes = boolean;
+export type CreateAccountDtoRes = boolean;

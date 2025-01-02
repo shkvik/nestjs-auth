@@ -9,10 +9,10 @@ import { Response } from 'express';
 import { Transactional } from 'typeorm-transactional';
 import { AuthCode } from 'src/schema/auth-code/auth-code.entity';
 import { UcallerService } from '../provider/ucaller.service';
-import { JwtService } from '../../common/jwt/jwt.service';
-import { setCookieRefreshToken } from '../../common/utilities/utilities.cookies';
-import { JwtAuthPayload } from '../../common/jwt/interface/jwt.interface';
-import { getCryptoCode } from '../../common/utilities/crypto-code';
+import { JwtService } from '../../jwt/jwt.service';
+import { setCookieRefreshToken } from '../../utilities/utilities.cookies';
+import { JwtAuthPayload } from '../../jwt/interface/jwt.interface';
+import { getCryptoCode } from '../../utilities/crypto-code';
 
 @Injectable()
 export class AuthenticationService {

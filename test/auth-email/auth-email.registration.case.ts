@@ -9,7 +9,7 @@ import {
   CreateDtoReq,
 } from 'src/modules/auth/auth-email/registration/dto';
 
-export class RegistrationCase {
+export class AuthEmailRegistrationCase {
   constructor(private readonly app: INestApplication) {}
 
   public async createAccounts(size: number = 10): Promise<User[]> {
@@ -23,6 +23,7 @@ export class RegistrationCase {
       );
 
       for (const [key, value] of Object.entries(dto)) {
+        //@ts-ignore
         req.field(key, value);
       }
       await req.expect(201);

@@ -6,23 +6,26 @@ import { compare } from 'bcrypt';
 import { LoginDtoReq, LoginDtoRes } from './dto';
 import { Response } from 'express';
 import { RefreshDtoRes } from './dto/refresh.dto';
-import { clearCookieRefreshToken, setCookieRefreshToken } from '../../utilities/utilities.cookies';
-import { JwtAuthPayload } from '../../jwt/interface/jwt.interface';
-import { JwtService } from '../../jwt/jwt.service';
-
+import { clearCookieRefreshToken, setCookieRefreshToken } from '../utilities/utilities.cookies';
+import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
+import { JwtService } from '../jwt/jwt.service';
 
 @Injectable()
 export class AuthenticationService {
-  @InjectRepository(User)
-  private readonly usersRepository: Repository<User>;
-
   @Inject()
   private readonly jwtService: JwtService;
 
+  @InjectRepository(User)
+  private readonly usersRep: Repository<User>;
+
   public async login(res: Response, dto: LoginDtoReq): Promise<LoginDtoRes> {
-    const user = await this.usersRepository.findOne({
+    const user = await this.usersRep.findOne({
       select: { id: true, password: true },
-      where: { email: dto.email, isActivated: true },
+      where: {
+        isActivated: true, 
+        email: dto.email,
+        phone: dto.phone,
+      },
     });
     if (!user) {
       throw new BadRequestException();
