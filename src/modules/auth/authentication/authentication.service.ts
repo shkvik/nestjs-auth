@@ -6,12 +6,12 @@ import { compare } from 'bcrypt';
 import { LoginDtoReq, LoginDtoRes } from './dto';
 import { Response } from 'express';
 import { RefreshDtoRes } from './dto/refresh.dto';
+import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
+import { JwtService } from '../jwt/jwt.service';
 import {
   clearCookieRefreshToken,
   setCookieRefreshToken,
 } from '../utilities/utilities.cookies';
-import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
-import { JwtService } from '../jwt/jwt.service';
 
 @Injectable()
 export class AuthenticationService {
