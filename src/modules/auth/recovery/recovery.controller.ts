@@ -8,6 +8,11 @@ import {
 } from '@nestjs/common';
 import { RecoveryService } from './recovery.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { BaseGuard } from 'src/guards/base.guard';
+import { CONFIG_AUTH } from 'src/config/config.export';
+import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
+import { Jwt } from '../jwt/jwt.decorator';
 import {
   SendRecoveryCodeDtoReq,
   SendRecoveryCodeDtoRes,
@@ -16,15 +21,10 @@ import {
   ConfirmRecoveryCodeDtoReq,
   ConfirmRecoveryCodeDtoRes,
 } from './dto/confirm-recovery-code.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { BaseGuard } from 'src/guards/base.guard';
-import { CONFIG_AUTH } from 'src/config/config.export';
 import {
   ChangePasswordDtoReq,
   ChangePasswordDtoRes,
 } from './dto/change-password.dto';
-import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
-import { Jwt } from '../jwt/jwt.decorator';
 
 @Controller('auth')
 @ApiTags('Auth')

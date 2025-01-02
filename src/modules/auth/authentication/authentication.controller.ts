@@ -50,7 +50,7 @@ export class AuthenticationController {
   /**
    * TODO
    */
-  @Post('2fa-totp')
+  @Post('2fa')
   @ApiBody({ type: LoginDtoReq })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
