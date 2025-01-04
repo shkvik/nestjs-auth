@@ -22,8 +22,8 @@ export class CreateAccountDtoReq {
     description: 'User phone',
     example: '+7(999) 555-22-11',
   })
-  @IsPhoneNumber()
   @Transform(({ value }) => value.replace(/\D/g, ''))
+  @IsPhoneNumber('RU')
   @ValidateIf((o: CreateAccountDtoReq) => !o.email)
   public phone?: string;
 

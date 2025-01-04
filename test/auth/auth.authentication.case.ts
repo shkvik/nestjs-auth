@@ -8,15 +8,15 @@ import { verify } from 'jsonwebtoken';
 import { CONFIG_AUTH } from 'src/config/config.export';
 import { hash } from 'bcrypt';
 import { validateObj } from '../utilities';
+import { 
+  LoginDtoReq, 
+  LoginDtoRes, 
+  RefreshDtoRes 
+} from 'src/modules/auth/authentication';
 import {
   JwtAuthPayload,
   JwtPair,
 } from 'src/modules/auth/jwt/interface/jwt.interface';
-import {
-  LoginDtoReq,
-  LoginDtoRes,
-  RefreshDtoRes,
-} from 'src/modules/auth/auth-email/authentication/dto';
 
 export class AuthEmailAuthenticationCase {
   constructor(private readonly app: INestApplication) {}
@@ -32,7 +32,7 @@ export class AuthEmailAuthenticationCase {
       const req = request(this.app.getHttpServer()).post('/auth-email/login');
 
       for (const [key, value] of Object.entries(dto)) {
-        req.field(key, value);
+        req.field(key, value as string);
       }
       const res = await req.expect(201);
       const body = res.body as LoginDtoRes;

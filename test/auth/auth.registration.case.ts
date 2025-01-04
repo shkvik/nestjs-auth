@@ -19,7 +19,7 @@ export class AuthEmailRegistrationCase {
     );
     for (const dto of dtos) {
       const req = request(this.app.getHttpServer()).post(
-        '/auth-email/create-account',
+        '/auth/create-account',
       );
 
       for (const [key, value] of Object.entries(dto)) {
@@ -62,7 +62,7 @@ export class AuthEmailRegistrationCase {
   private createFakeDtoActivate(users: User[]): ActivateAccountDtoReq[] {
     return users.map((user) => {
       return {
-        code: user.activationLink,
+        code: user.authCode.code,
       } as ActivateAccountDtoReq;
     });
   }

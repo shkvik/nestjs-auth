@@ -9,7 +9,8 @@ import { User } from 'src/db/entities/user.entity';
 import { DataSource, QueryRunner } from 'typeorm';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 import * as cookieParser from 'cookie-parser';
-import { EmailService } from 'src/modules/auth/auth-email/provider/email.service';
+import { EmailService } from 'src/modules/auth/providers';
+
 
 export class AppBuilder {
   private app: INestApplication;

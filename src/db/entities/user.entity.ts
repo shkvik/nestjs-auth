@@ -18,9 +18,6 @@ export class User extends BaseEntity {
   @Column({ default: false, name: 'is_activated' })
   isActivated: boolean;
 
-  @Column({ nullable: true, name: 'activation_link' })
-  activationLink: string;
-
   @OneToMany(() => JwtToken, (jwtToken) => jwtToken.user)
   jwtTokens: JwtToken[];
 

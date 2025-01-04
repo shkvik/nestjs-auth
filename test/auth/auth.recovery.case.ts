@@ -5,13 +5,9 @@ import { In, Repository } from 'typeorm';
 import * as request from 'supertest';
 import { validateObj } from '../utilities';
 import { RecoveryCode } from 'src/db/entities/recovery-code.entity';
-import { AuthEmailRegistrationCase } from './auth-email.registration.case';
-import {
-  ConfirmDtoReq,
-  ConfirmDtoRes,
-  SendDtoReq,
-  SendDtoRes,
-} from 'src/modules/auth/auth-email/recovery/dto';
+import { AuthEmailRegistrationCase } from './auth.registration.case';
+import { ConfirmRecoveryCodeDtoReq, ConfirmRecoveryCodeDtoRes, SendRecoveryCodeDtoReq, SendRecoveryCodeDtoRes } from 'src/modules/auth/recovery';
+
 
 export class AuthEmailRecoveryCase {
   constructor(private readonly app: INestApplication) {}
@@ -24,7 +20,7 @@ export class AuthEmailRecoveryCase {
     const userIds = new Set();
 
     for (const user of savedUsers) {
-      const dto: SendDtoReq = {
+      const dto: SendRecoveryCodeDtoReq = {
         email: user.email,
       };
       userIds.add(user.id);
@@ -36,7 +32,7 @@ export class AuthEmailRecoveryCase {
         req.field(key, value);
       }
       const res = await req.expect(201);
-      validateObj({ type: SendDtoRes, obj: res.body });
+      validateObj({ type: SendRecoveryCodeDtoRes, obj: res.body });
     }
     const codes = await recoveryCodeRepository.find({
       relations: { user: true },
@@ -52,7 +48,7 @@ export class AuthEmailRecoveryCase {
     const codes = await this.sendCodes(size);
     const recoveryTokens: string[] = [];
     for (const code of codes) {
-      const dto: ConfirmDtoReq = {
+      const dto: ConfirmRecoveryCodeDtoReq = {
         code: code.code,
       };
       const req = request(this.app.getHttpServer()).post(
@@ -63,7 +59,7 @@ export class AuthEmailRecoveryCase {
         req.field(key, value);
       }
       const res = await req.expect(201);
-      validateObj({ type: ConfirmDtoRes, obj: res.body });
+      validateObj({ type: ConfirmRecoveryCodeDtoRes, obj: res.body });
       recoveryTokens.push(res.body.recoveryToken);
     }
   }

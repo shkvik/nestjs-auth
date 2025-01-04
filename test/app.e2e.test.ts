@@ -4,7 +4,7 @@ import {
   AuthEmailAuthenticationCase,
   AuthEmailRecoveryCase,
   AuthEmailRegistrationCase,
-} from './auth-email';
+} from './auth';
 
 describe('Tests (e2e)', () => {
   let app: INestApplication;

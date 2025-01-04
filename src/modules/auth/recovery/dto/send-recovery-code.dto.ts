@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { Allow, IsEmail, IsPhoneNumber, ValidateIf } from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsPhoneNumber, ValidateIf } from 'class-validator';
 
 export class SendRecoveryCodeDtoReq {
   @ApiProperty({
@@ -24,6 +24,7 @@ export class SendRecoveryCodeDtoReq {
 }
 
 export class SendRecoveryCodeDtoRes {
-  @Allow()
+  @IsBoolean()
+  @IsNotEmpty()
   result: boolean;
 }
