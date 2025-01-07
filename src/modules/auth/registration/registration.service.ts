@@ -66,7 +66,7 @@ export class RegistrationService {
       user: { id: user.id },
     });
     if (dto.email) {
-      await this.emailService.sendActivationCode({
+      await this.emailService.sendAuthCode({
         to: dto.email,
         code: secretCode,
       });

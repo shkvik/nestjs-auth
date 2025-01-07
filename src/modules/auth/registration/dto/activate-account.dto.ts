@@ -1,13 +1,15 @@
-import { Allow, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ActivateAccountDtoReq {
   @ApiProperty({ description: 'Auth code' })
   @IsString()
+  @IsNotEmpty()
   public code: string;
 }
 
 export class ActivateAccountDtoRes {
-  @Allow()
+  @IsString()
+  @IsNotEmpty()
   accessToken: string;
 }

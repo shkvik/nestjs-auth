@@ -25,7 +25,7 @@ export class EmailService {
   }
 
   @MockMethod({ condition: () => CONFIG_APP.NODE_ENV === 'local' })
-  public async sendActivationCode(options: {
+  public async sendAuthCode(options: {
     to: string;
     code: string;
   }): Promise<void> {
@@ -37,24 +37,6 @@ export class EmailService {
 			<div> 
 				<h1>Your activation code</h1>
 				<a href="${options.code}">${options.code}</a>
-			</div> 
-			`,
-    });
-  }
-
-  @MockMethod({ condition: () => CONFIG_APP.NODE_ENV === 'local' })
-  public async sendActivationMail(options: {
-    to: string;
-    link: string;
-  }): Promise<void> {
-    await this.Transporter.sendMail({
-      from: tmp_email,
-      to: options.to,
-      subject: 'Account activation link',
-      html: `
-			<div> 
-				<h1>For activation go to link</h1>
-				<a href="${options.link}">${options.link}</a>
 			</div> 
 			`,
     });

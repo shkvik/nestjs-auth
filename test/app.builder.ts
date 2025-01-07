@@ -10,6 +10,7 @@ import { DataSource, QueryRunner } from 'typeorm';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 import * as cookieParser from 'cookie-parser';
 import { EmailService } from 'src/modules/auth/providers';
+import { AuthCode } from 'src/db/entities/auth-code.entity';
 
 
 export class AppBuilder {
@@ -27,26 +28,23 @@ export class AppBuilder {
       this.dataSource.manager.connection.createQueryRunner();
     await this.transactionRunner.startTransaction('SERIALIZABLE');
 
-    const usersRepository = this.transactionRunner.manager.getRepository(User);
-    const jwtRepository =
-      this.transactionRunner.manager.getRepository(JwtToken);
-    const recoveryCodeRepository =
-      this.transactionRunner.manager.getRepository(RecoveryCode);
-
-    const mockEmailService = {
-      sendActivationMail: jest.fn(),
+    const mockEmailService: EmailService = {
+      sendAuthCode: jest.fn(),
       sendRecoveryCode: jest.fn(),
+      Transporter: undefined
     };
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
       .overrideProvider(getRepositoryToken(JwtToken))
-      .useValue(jwtRepository)
+      .useValue(this.transactionRunner.manager.getRepository(JwtToken))
       .overrideProvider(getRepositoryToken(User))
-      .useValue(usersRepository)
+      .useValue(this.transactionRunner.manager.getRepository(User))
       .overrideProvider(getRepositoryToken(RecoveryCode))
-      .useValue(recoveryCodeRepository)
+      .useValue(this.transactionRunner.manager.getRepository(RecoveryCode))
+      .overrideProvider(getRepositoryToken(AuthCode))
+      .useValue(this.transactionRunner.manager.getRepository(AuthCode))
       .overrideProvider(EmailService)
       .useValue(mockEmailService)
       .compile();

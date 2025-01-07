@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
 import { User } from 'src/db/entities/user.entity';
 import { In, Repository } from 'typeorm';
+import { EmailService } from 'src/modules/auth/providers';
 import {
   ActivateAccountDtoReq,
   CreateAccountDtoReq,
@@ -17,21 +18,34 @@ export class AuthEmailRegistrationCase {
     const usersRepository = this.app.get<Repository<User>>(
       getRepositoryToken(User),
     );
+    const emailService = this.app.get(EmailService);
+    const emailCodes = new Map<string, string>();
+    jest.spyOn(emailService, 'sendAuthCode')
+      .mockImplementation(async (options: {
+        to: string;
+        code: string;
+      }) => {
+        emailCodes.set(options.to, options.code);
+      });
+
     for (const dto of dtos) {
       const req = request(this.app.getHttpServer()).post(
         '/auth/create-account',
       );
-
       for (const [key, value] of Object.entries(dto)) {
         req.field(key, value);
       }
       await req.expect(201);
     }
     const createdUsers = await usersRepository.find({
+      relationLoadStrategy: 'join',
+      relations: { authCode: true, },
       where: { email: In(dtos.map((dto) => dto.email)) },
     });
     expect(createdUsers.length).toBe(dtos.length);
-
+    createdUsers.forEach(user => {
+      user.authCode.code = emailCodes.get(user.email)
+    });
     return createdUsers;
   }
 
@@ -70,6 +84,7 @@ export class AuthEmailRegistrationCase {
   private createFakeDtoCreate(size: number): CreateAccountDtoReq[] {
     const fakeDtoes = Array.from({ length: size }, () => {
       return {
+        phone: `+7 ${faker.phone.number()}`,
         email: faker.internet.email(),
         password: faker.internet.password({ length: 16 }),
       } as CreateAccountDtoReq;
