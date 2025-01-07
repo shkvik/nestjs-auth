@@ -2,14 +2,16 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppModule } from 'src/modules/app/app.module';
-import { EmailService } from 'src/modules/auth/auth-email/services/email/email.service';
-import { dataSourceUserOption } from 'src/schema/datasource';
-import { JwtToken } from 'src/schema/jwt-tokens/jwt.token.entity';
-import { RecoveryCode } from 'src/schema/recovery-code/recovery-code.entity';
-import { User } from 'src/schema/users/user.entity';
+import { dataSourceUserOption } from 'src/db/datasource';
+import { JwtToken } from 'src/db/entities/jwt.token.entity';
+import { RecoveryCode } from 'src/db/entities/recovery-code.entity';
+import { User } from 'src/db/entities/user.entity';
 import { DataSource, QueryRunner } from 'typeorm';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 import * as cookieParser from 'cookie-parser';
+import { EmailService } from 'src/modules/auth/providers';
+import { AuthCode } from 'src/db/entities/auth-code.entity';
+
 
 export class AppBuilder {
   private app: INestApplication;
@@ -26,26 +28,23 @@ export class AppBuilder {
       this.dataSource.manager.connection.createQueryRunner();
     await this.transactionRunner.startTransaction('SERIALIZABLE');
 
-    const usersRepository = this.transactionRunner.manager.getRepository(User);
-    const jwtRepository =
-      this.transactionRunner.manager.getRepository(JwtToken);
-    const recoveryCodeRepository =
-      this.transactionRunner.manager.getRepository(RecoveryCode);
-
-    const mockEmailService = {
-      sendActivationMail: jest.fn(),
+    const mockEmailService: EmailService = {
+      sendAuthCode: jest.fn(),
       sendRecoveryCode: jest.fn(),
+      Transporter: undefined
     };
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
       .overrideProvider(getRepositoryToken(JwtToken))
-      .useValue(jwtRepository)
+      .useValue(this.transactionRunner.manager.getRepository(JwtToken))
       .overrideProvider(getRepositoryToken(User))
-      .useValue(usersRepository)
+      .useValue(this.transactionRunner.manager.getRepository(User))
       .overrideProvider(getRepositoryToken(RecoveryCode))
-      .useValue(recoveryCodeRepository)
+      .useValue(this.transactionRunner.manager.getRepository(RecoveryCode))
+      .overrideProvider(getRepositoryToken(AuthCode))
+      .useValue(this.transactionRunner.manager.getRepository(AuthCode))
       .overrideProvider(EmailService)
       .useValue(mockEmailService)
       .compile();
