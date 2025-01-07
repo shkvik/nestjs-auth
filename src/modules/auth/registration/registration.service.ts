@@ -14,12 +14,12 @@ import { IsolationLevel, Transactional } from 'typeorm-transactional';
 import { setCookieRefreshToken } from '../utilities/utilities.cookies';
 import { getCryptoCode } from '../utilities/crypto-code';
 import { AuthCode } from 'src/db/entities/auth-code.entity';
-import { EmailService, PhoneService } from '../providers';
+import { IdentityService } from '../identities';
+import { Identity } from 'src/db/entities';
 import {
   ActivateAccountDtoReq,
   ActivateAccountDtoRes,
   CreateAccountDtoReq,
-  CreateAccountDtoRes,
 } from './dto';
 
 @Injectable()
@@ -28,13 +28,13 @@ export class RegistrationService {
   private readonly jwtService: JwtService;
 
   @Inject()
-  private readonly phoneService: PhoneService;
-
-  @Inject()
-  private readonly emailService: EmailService;
+  private readonly identityService: IdentityService;
 
   @InjectRepository(User)
   private readonly userRep: Repository<User>;
+
+  @InjectRepository(Identity)
+  private readonly identityRep: Repository<Identity>;
 
   @InjectRepository(AuthCode)
   private readonly authCodeRep: Repository<AuthCode>;
@@ -42,44 +42,36 @@ export class RegistrationService {
   @Transactional({ isolationLevel: IsolationLevel.REPEATABLE_READ })
   public async createAccount(
     dto: CreateAccountDtoReq,
-  ): Promise<CreateAccountDtoRes> {
-    let user = await this.userRep.findOne({
+  ): Promise<void> {
+    let identity = await this.identityRep.findOne({
       relationLoadStrategy: 'join',
-      relations: { authCode: true },
-      select: { id: true },
-      where: [{ email: dto.email }, { phone: dto.phone }],
+      relations: { user: { authCode: true } },
+      where: { data: dto.contact },
     });
-    if (user && user.authCode) {
+    if (identity || identity.user.isActivated || identity.user.authCode) {
       throw new ConflictException();
     }
     const secretCode = getCryptoCode(4);
     const hashCode = await hash(secretCode, 3);
     const hashPassword = await hash(dto.password, 3);
-
-    user = await this.userRep.save({
-      email: dto.email,
-      phone: dto.phone,
+    const user = await this.userRep.save({
       password: hashPassword,
+    });
+    identity = await this.identityRep.save({
+      type: dto.identityType,
+      data: dto.contact,
+      user,
     });
     await this.authCodeRep.save({
       code: hashCode,
       user: { id: user.id },
     });
-    if (dto.email) {
-      await this.emailService.sendAuthCode({
-        to: dto.email,
+    await this.identityService
+      .getProvider(dto.identityType)
+      .sendAuthCode({
+        to: dto.contact,
         code: secretCode,
       });
-      return;
-    }
-    if (dto.phone) {
-      await this.phoneService.initCall({
-        phone: Number(dto.phone),
-        code: Number(secretCode),
-        client: 'test',
-      });
-      return;
-    }
   }
 
   @Transactional({ isolationLevel: IsolationLevel.REPEATABLE_READ })

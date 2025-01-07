@@ -3,13 +3,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppModule } from 'src/modules/app/app.module';
 import { dataSourceUserOption } from 'src/db/datasource';
-import { JwtToken } from 'src/db/entities/jwt.token.entity';
+import { JwtToken } from 'src/db/entities/jwt-token.entity';
 import { RecoveryCode } from 'src/db/entities/recovery-code.entity';
 import { User } from 'src/db/entities/user.entity';
 import { DataSource, QueryRunner } from 'typeorm';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 import * as cookieParser from 'cookie-parser';
-import { EmailService } from 'src/modules/auth/providers';
+import { EmailService } from 'src/modules/auth/identities';
 import { AuthCode } from 'src/db/entities/auth-code.entity';
 
 

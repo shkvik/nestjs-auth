@@ -6,7 +6,7 @@ import { RecoveryCode } from 'src/db/entities/recovery-code.entity';
 import { hash } from 'bcrypt';
 import { IsolationLevel, Transactional } from 'typeorm-transactional';
 import { JwtService } from '../jwt/jwt.service';
-import { EmailService, PhoneService } from '../providers';
+import { IdentityService } from '../identities';
 import { getCryptoCode } from '../utilities/crypto-code';
 import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
 import {
@@ -15,8 +15,8 @@ import {
   ConfirmRecoveryCodeDtoReq,
   ConfirmRecoveryCodeDtoRes,
   SendRecoveryCodeDtoReq,
-  SendRecoveryCodeDtoRes,
 } from './dto';
+import { Identity } from 'src/db/entities';
 
 @Injectable()
 export class RecoveryService {
@@ -24,13 +24,13 @@ export class RecoveryService {
   private readonly jwtService: JwtService;
 
   @Inject()
-  private readonly smsProviderService: PhoneService;
-
-  @Inject()
-  private readonly emailProviderService: EmailService;
+  private readonly identityService: IdentityService;
 
   @InjectRepository(User)
   private readonly userRep: Repository<User>;
+
+  @InjectRepository(Identity)
+  private readonly identityRep: Repository<Identity>;
 
   @InjectRepository(RecoveryCode)
   private readonly recoveryCodeRep: Repository<RecoveryCode>;
@@ -38,34 +38,28 @@ export class RecoveryService {
   @Transactional({ isolationLevel: IsolationLevel.REPEATABLE_READ })
   public async sendRecoveryCode(
     dto: SendRecoveryCodeDtoReq,
-  ): Promise<SendRecoveryCodeDtoRes> {
-    const user = await this.userRep.findOne({
+  ): Promise<void> {
+    let identity = await this.identityRep.findOne({
       relationLoadStrategy: 'join',
-      relations: { recoveryCode: true },
-      where: [{ email: dto.email }, { phone: dto.phone }],
+      relations: { user: { authCode: true } },
+      where: { data: dto.contact },
     });
-    if (!user || user.recoveryCode) {
+    if (identity || identity.user.recoveryCode) {
       throw new BadRequestException();
     }
     const secretCode = getCryptoCode(6);
     const hashCode = await hash(secretCode, 3);
 
-    await this.recoveryCodeRep.save({ code: hashCode, user });
-    if (user.email) {
-      await this.emailProviderService.sendRecoveryCode({
-        to: dto.email,
+    await this.recoveryCodeRep.save({ 
+      code: hashCode, 
+      user: identity.user 
+    });
+    await this.identityService
+      .getProvider(dto.identityType)
+      .sendRecoveryCode({
+        to: dto.contact,
         code: secretCode,
       });
-      return;
-    }
-    if (user.phone) {
-      await this.smsProviderService.initCall({
-        phone: Number(dto.phone),
-        code: Number(secretCode),
-        client: 'test',
-      });
-      return;
-    }
   }
 
   @Transactional({ isolationLevel: IsolationLevel.REPEATABLE_READ })

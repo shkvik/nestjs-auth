@@ -1,30 +1,34 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsEmail, IsNotEmpty, IsPhoneNumber, ValidateIf } from 'class-validator';
+import { IdentityType } from 'src/db/entities';
+import { 
+  IsEmail, 
+  IsEnum, 
+  IsPhoneNumber, 
+  IsString, 
+  ValidateIf 
+} from 'class-validator';
 
 export class SendRecoveryCodeDtoReq {
   @ApiProperty({
-    required: false,
-    description: 'Email address of the user',
-    example: 'example@email.com',
+    required: true,
+    description: 'Type of the identity',
+    enum: IdentityType,
+    example: IdentityType.EMAIL,
   })
-  @IsEmail()
-  @ValidateIf((o: SendRecoveryCodeDtoReq) => !o.phone)
-  public email?: string;
+  @IsEnum(IdentityType)
+  public identityType: IdentityType;
 
   @ApiProperty({
     required: false,
-    description: 'User phone',
-    example: '+7(999) 555-22-11',
+    description: 'Contact value (email or phone depending on contactType)',
+    example: ['+7(999) 555-22-11', 'example@email.com'],
   })
-  @IsPhoneNumber()
-  @Transform(({ value }) => value.replace(/\D/g, ''))
-  @ValidateIf((o: SendRecoveryCodeDtoReq) => !o.email)
-  public phone?: string;
-}
-
-export class SendRecoveryCodeDtoRes {
-  @IsBoolean()
-  @IsNotEmpty()
-  result: boolean;
+  @ValidateIf((o: SendRecoveryCodeDtoReq) => o.identityType === IdentityType.EMAIL)
+  @IsEmail()
+  @ValidateIf((o: SendRecoveryCodeDtoReq) => o.identityType === IdentityType.PHONE)
+  @Transform(({ value }) => value.replace(/\D/g, ''), { groups: [IdentityType.PHONE] })
+  @IsPhoneNumber('RU', { groups: [IdentityType.PHONE] })
+  @IsString()
+  public contact: string;
 }

@@ -12,7 +12,6 @@ import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   CreateAccountDtoReq,
-  CreateAccountDtoRes,
   ActivateAccountDtoReq,
   ActivateAccountDtoRes,
 } from './dto';
@@ -29,8 +28,8 @@ export class RegistrationController {
   @UseInterceptors(FileInterceptor('file'))
   public async createAccount(
     @Body() dto: CreateAccountDtoReq,
-  ): Promise<CreateAccountDtoRes> {
-    return this.registrationService.createAccount(dto);
+  ): Promise<void> {
+    await this.registrationService.createAccount(dto);
   }
 
   @Post('activate-account')

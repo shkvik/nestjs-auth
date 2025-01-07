@@ -1,31 +1,37 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
+import { IdentityType } from 'src/db/entities';
 import {
   IsStrongPassword,
   IsEmail,
   IsPhoneNumber,
   ValidateIf,
+  IsEnum,
+  IsString,
 } from 'class-validator';
 
 export class CreateAccountDtoReq {
   @ApiProperty({
-    required: false,
-    description: 'Email address of the user',
-    example: 'example@email.com',
+    required: true,
+    description: 'Type of the identity',
+    enum: IdentityType,
+    example: IdentityType.EMAIL,
   })
-  @IsEmail()
-  @ValidateIf((o: CreateAccountDtoReq) => !o.phone)
-  public email?: string;
+  @IsEnum(IdentityType)
+  public identityType: IdentityType;
 
   @ApiProperty({
     required: false,
-    description: 'User phone',
-    example: '+7(999) 555-22-11',
+    description: 'Contact value (email or phone depending on contactType)',
+    example: ['+7(999) 555-22-11', 'example@email.com'],
   })
-  @Transform(({ value }) => value.replace(/\D/g, ''))
-  @IsPhoneNumber('RU')
-  @ValidateIf((o: CreateAccountDtoReq) => !o.email)
-  public phone?: string;
+  @ValidateIf((o: CreateAccountDtoReq) => o.identityType === IdentityType.EMAIL)
+  @IsEmail()
+  @ValidateIf((o: CreateAccountDtoReq) => o.identityType === IdentityType.PHONE)
+  @Transform(({ value }) => value.replace(/\D/g, ''), { groups: [IdentityType.PHONE] })
+  @IsPhoneNumber('RU', { groups: [IdentityType.PHONE] })
+  @IsString()
+  public contact: string;
 
   @ApiProperty({
     description: 'User password',
@@ -40,5 +46,3 @@ export class CreateAccountDtoReq {
   })
   public password: string;
 }
-
-export type CreateAccountDtoRes = boolean;

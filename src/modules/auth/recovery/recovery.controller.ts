@@ -15,7 +15,6 @@ import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
 import { Jwt } from '../jwt/jwt.decorator';
 import {
   SendRecoveryCodeDtoReq,
-  SendRecoveryCodeDtoRes,
 } from './dto/send-recovery-code.dto';
 import {
   ConfirmRecoveryCodeDtoReq,
@@ -38,7 +37,7 @@ export class RecoveryController {
   @UseInterceptors(FileInterceptor('file'))
   public async sendRecoveryCode(
     @Body() dto: SendRecoveryCodeDtoReq,
-  ): Promise<SendRecoveryCodeDtoRes> {
+  ): Promise<void> {
     return this.recoveryService.sendRecoveryCode(dto);
   }
 

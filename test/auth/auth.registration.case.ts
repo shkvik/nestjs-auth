@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
 import { User } from 'src/db/entities/user.entity';
 import { In, Repository } from 'typeorm';
-import { EmailService } from 'src/modules/auth/providers';
+import { EmailService } from 'src/modules/auth/identities';
 import {
   ActivateAccountDtoReq,
   CreateAccountDtoReq,

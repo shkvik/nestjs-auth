@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { JwtService } from './jwt.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtToken } from 'src/db/entities/jwt.token.entity';
+import { JwtToken } from 'src/db/entities/jwt-token.entity';
 
 @Global()
 @Module({

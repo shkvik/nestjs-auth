@@ -3,15 +3,20 @@ import { Transporter, createTransport } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { CONFIG_APP } from 'src/config/config.export';
 import { MockMethod } from 'src/modules/auth/utilities/mock.decorator';
+import { IdentityProvider } from '../identity.abstract';
+import { IdentityType } from 'src/db/entities';
 
 const tmp_email = 'tmp_email';
 const tmp_password = 'tmp_password';
 
 @Injectable()
-export class EmailService {
+export class EmailService extends IdentityProvider {
+  public override readonly type = IdentityType.PHONE;
+  
   public readonly Transporter: Transporter<SMTPTransport.SentMessageInfo>;
 
   constructor() {
+    super();
     this.Transporter = createTransport({
       service: 'gmail',
       host: 'smtp.gmail.com',

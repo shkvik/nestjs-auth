@@ -25,9 +25,9 @@ export class AuthenticationService {
     const user = await this.usersRep.findOne({
       select: { id: true, password: true },
       where: {
-        isActivated: true,
-        email: dto.email,
-        phone: dto.phone,
+        // isActivated: true,
+        // email: dto.email,
+        // phone: dto.phone,
       },
     });
     if (!user) {
