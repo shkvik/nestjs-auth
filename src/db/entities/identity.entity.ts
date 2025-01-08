@@ -17,7 +17,7 @@ export class Identity extends BaseEntity {
   type: IdentityType;
 
   @Column({ unique: true })
-  data?: string;
+  contact?: string;
 
   @Index()
   @ManyToOne(() => User)

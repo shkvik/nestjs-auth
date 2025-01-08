@@ -11,7 +11,7 @@ const tmp_password = 'tmp_password';
 
 @Injectable()
 export class EmailService extends IdentityProvider {
-  public override readonly type = IdentityType.PHONE;
+  public override readonly type = IdentityType.EMAIL;
   
   public readonly Transporter: Transporter<SMTPTransport.SentMessageInfo>;
 

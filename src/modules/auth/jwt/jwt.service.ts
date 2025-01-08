@@ -5,6 +5,7 @@ import { JwtPayload, sign, verify } from 'jsonwebtoken';
 import { JwtToken } from 'src/db/entities/jwt-token.entity';
 import { JwtAuthPayload, JwtPair } from './interface/jwt.interface';
 import { CONFIG_AUTH } from 'src/config/config.export';
+import { Propagation, Transactional } from 'typeorm-transactional';
 import { randomUUID } from 'crypto';
 import { hash } from 'bcrypt';
 
@@ -19,6 +20,7 @@ export class JwtService {
     });
   }
 
+  @Transactional({ propagation: Propagation.SUPPORTS })
   public async createJwtTokens(userId: number): Promise<JwtPair> {
     const sessionId = randomUUID();
     const { accessToken, refreshToken } = this.generateAuthTokens({
@@ -34,6 +36,7 @@ export class JwtService {
     return { accessToken, refreshToken };
   }
 
+  @Transactional({ propagation: Propagation.SUPPORTS })
   public async updateJwtTokens(
     userId: number,
     sessionId: string,

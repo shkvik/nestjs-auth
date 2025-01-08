@@ -1,7 +1,8 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IdentityDto } from '../../common';
 
-export class ActivateAccountDtoReq {
+export class ActivateAccountDtoReq extends IdentityDto {
   @ApiProperty({ description: 'Auth code' })
   @IsString()
   @IsNotEmpty()

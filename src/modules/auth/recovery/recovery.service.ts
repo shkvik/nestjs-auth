@@ -42,9 +42,9 @@ export class RecoveryService {
     let identity = await this.identityRep.findOne({
       relationLoadStrategy: 'join',
       relations: { user: { authCode: true } },
-      where: { data: dto.contact },
+      where: { contact: dto.contact },
     });
-    if (identity || identity.user.recoveryCode) {
+    if (identity || identity?.user?.recoveryCode) {
       throw new BadRequestException();
     }
     const secretCode = getCryptoCode(6);

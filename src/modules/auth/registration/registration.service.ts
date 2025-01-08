@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { hash } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { User } from 'src/db/entities/user.entity';
 import { JwtService } from '../jwt/jwt.service';
 import { Response } from 'express';
@@ -46,9 +46,9 @@ export class RegistrationService {
     let identity = await this.identityRep.findOne({
       relationLoadStrategy: 'join',
       relations: { user: { authCode: true } },
-      where: { data: dto.contact },
+      where: { contact: dto.contact },
     });
-    if (identity || identity.user.isActivated || identity.user.authCode) {
+    if (identity || identity?.user?.isActivated || identity?.user?.authCode) {
       throw new ConflictException();
     }
     const secretCode = getCryptoCode(4);
@@ -58,16 +58,16 @@ export class RegistrationService {
       password: hashPassword,
     });
     identity = await this.identityRep.save({
-      type: dto.identityType,
-      data: dto.contact,
-      user,
+      type: dto.identity,
+      contact: dto.contact,
+      user: { id: user.id },
     });
     await this.authCodeRep.save({
       code: hashCode,
       user: { id: user.id },
     });
     await this.identityService
-      .getProvider(dto.identityType)
+      .getProvider(dto.identity)
       .sendAuthCode({
         to: dto.contact,
         code: secretCode,
@@ -79,19 +79,24 @@ export class RegistrationService {
     res: Response,
     dto: ActivateAccountDtoReq,
   ): Promise<ActivateAccountDtoRes> {
-    const code = await this.authCodeRep.findOne({
+    const identity = await this.identityRep.findOne({
       relationLoadStrategy: 'join',
-      relations: { user: true },
-      where: { code: dto.code },
+      relations: { user: { authCode: true } },
+      where: { contact: dto.contact },
     });
-    if (!code) {
+    if (!identity || identity.user.isActivated) {
       throw new BadRequestException();
     }
-    code.user.isActivated = true;
-    await this.authCodeRep.delete(code.id);
-    await this.userRep.save(code.user);
+    const isCodeEquals = await compare(dto.code, identity.user.authCode.code);
+    if (!isCodeEquals) {
+      throw new BadRequestException();
+    }
+    await this.authCodeRep.delete(identity.user.authCode.id);
+    await this.userRep.update(identity.user.id, {
+      isActivated: true
+    });
     const { accessToken, refreshToken } = await this.jwtService.createJwtTokens(
-      code.user.id,
+      identity.user.id,
     );
     setCookieRefreshToken(res, refreshToken);
     return { accessToken };
