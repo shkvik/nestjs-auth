@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsStrongPassword } from 'class-validator';
+import { IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
 
 export class ChangePasswordDtoReq {
   @ApiProperty({ description: 'User password' })
@@ -9,6 +9,7 @@ export class ChangePasswordDtoReq {
 }
 
 export class ChangePasswordDtoRes {
+  @IsString()
+  @IsNotEmpty()
   accessToken: string;
-  refreshToken: string;
 }

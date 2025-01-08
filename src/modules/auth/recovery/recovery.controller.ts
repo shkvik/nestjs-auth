@@ -3,6 +3,7 @@ import {
   Controller,
   Inject,
   Post,
+  Res,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { BaseGuard } from 'src/guards/base.guard';
 import { CONFIG_AUTH } from 'src/config/config.export';
 import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
 import { Jwt } from '../jwt/jwt.decorator';
+import { Response } from 'express';
 import {
   SendRecoveryCodeDtoReq,
 } from './dto/send-recovery-code.dto';
@@ -58,9 +60,10 @@ export class RecoveryController {
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(new BaseGuard(CONFIG_AUTH.JWT_RECOVERY))
   public async changePassword(
+    @Res({ passthrough: true }) res: Response,
     @Body() dto: ChangePasswordDtoReq,
     @Jwt() jwt: JwtAuthPayload,
   ): Promise<ChangePasswordDtoRes> {
-    return this.recoveryService.changePassword(dto, jwt);
+    return this.recoveryService.changePassword(res, dto, jwt);
   }
 }

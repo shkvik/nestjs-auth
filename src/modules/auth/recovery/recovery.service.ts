@@ -9,6 +9,9 @@ import { JwtService } from '../jwt/jwt.service';
 import { IdentityService } from '../identities';
 import { getCryptoCode } from '../utilities/crypto-code';
 import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
+import { Identity } from 'src/db/entities';
+import { setCookieRefreshToken } from '../utilities';
+import { Response } from 'express';
 import {
   ChangePasswordDtoReq,
   ChangePasswordDtoRes,
@@ -16,7 +19,6 @@ import {
   ConfirmRecoveryCodeDtoRes,
   SendRecoveryCodeDtoReq,
 } from './dto';
-import { Identity } from 'src/db/entities';
 
 @Injectable()
 export class RecoveryService {
@@ -39,23 +41,23 @@ export class RecoveryService {
   public async sendRecoveryCode(
     dto: SendRecoveryCodeDtoReq,
   ): Promise<void> {
-    let identity = await this.identityRep.findOne({
+    const identity = await this.identityRep.findOne({
       relationLoadStrategy: 'join',
-      relations: { user: { authCode: true } },
+      relations: { user: { recoveryCode: true } },
       where: { contact: dto.contact },
     });
-    if (identity || identity?.user?.recoveryCode) {
+    if (!identity || !identity.user.isActivated || identity.user.recoveryCode) {
       throw new BadRequestException();
     }
     const secretCode = getCryptoCode(6);
     const hashCode = await hash(secretCode, 3);
 
-    await this.recoveryCodeRep.save({ 
-      code: hashCode, 
-      user: identity.user 
+    await this.recoveryCodeRep.save({
+      code: hashCode,
+      user: { id: identity.user.id }
     });
     await this.identityService
-      .getProvider(dto.identityType)
+      .getProvider(dto.identity)
       .sendRecoveryCode({
         to: dto.contact,
         code: secretCode,
@@ -66,26 +68,28 @@ export class RecoveryService {
   public async confirmCode(
     dto: ConfirmRecoveryCodeDtoReq,
   ): Promise<ConfirmRecoveryCodeDtoRes> {
-    const recoveryCode = await this.recoveryCodeRep.findOne({
-      relations: { user: true },
-      where: { code: dto.code },
+    const identity = await this.identityRep.findOne({
+      relationLoadStrategy: 'join',
+      relations: { user: { recoveryCode: true } },
+      where: { contact: dto.contact },
     });
-    if (!recoveryCode) {
+    if (!identity || !identity.user.recoveryCode) {
       throw new BadRequestException();
     }
-    await this.recoveryCodeRep.delete(recoveryCode.id);
+    await this.recoveryCodeRep.delete(identity.user.recoveryCode.id);
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    if (recoveryCode.created_at >= fiveMinutesAgo) {
+    if (identity.user.recoveryCode.created_at >= fiveMinutesAgo) {
       throw new BadRequestException();
     }
     const recoveryToken = await this.jwtService.getRecoveryToken(
-      recoveryCode.user.id,
+      identity.user.id,
     );
     return { recoveryToken };
   }
 
   @Transactional({ isolationLevel: IsolationLevel.REPEATABLE_READ })
   public async changePassword(
+    res: Response,
     dto: ChangePasswordDtoReq,
     jwt: JwtAuthPayload,
   ): Promise<ChangePasswordDtoRes> {
@@ -100,6 +104,8 @@ export class RecoveryService {
     await this.userRep.update(user, {
       password: hashPassword,
     });
-    return this.jwtService.createJwtTokens(jwt.userId);
+    const { accessToken, refreshToken } = await this.jwtService.createJwtTokens(jwt.userId);
+    setCookieRefreshToken(res, refreshToken);
+    return { accessToken };
   }
 }
