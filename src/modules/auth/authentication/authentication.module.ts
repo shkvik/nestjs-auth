@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 import { JwtModule } from '../jwt/jwt.module';
-import { User } from 'src/db/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Identity } from 'src/db/entities';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), JwtModule],
+  imports: [TypeOrmModule.forFeature([Identity]), JwtModule],
   controllers: [AuthenticationController],
   providers: [AuthenticationService],
 })

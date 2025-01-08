@@ -1,13 +1,13 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from 'src/db/entities/user.entity';
 import { compare } from 'bcrypt';
 import { LoginDtoReq, LoginDtoRes } from './dto';
 import { Response } from 'express';
 import { RefreshDtoRes } from './dto/refresh.dto';
 import { JwtAuthPayload } from '../jwt/interface/jwt.interface';
 import { JwtService } from '../jwt/jwt.service';
+import { Identity } from 'src/db/entities';
 import {
   clearCookieRefreshToken,
   setCookieRefreshToken,
@@ -18,26 +18,23 @@ export class AuthenticationService {
   @Inject()
   private readonly jwtService: JwtService;
 
-  @InjectRepository(User)
-  private readonly usersRep: Repository<User>;
+  @InjectRepository(Identity)
+  private readonly identityRep: Repository<Identity>;
 
   public async login(res: Response, dto: LoginDtoReq): Promise<LoginDtoRes> {
-    const user = await this.usersRep.findOne({
-      select: { id: true, password: true },
-      where: {
-        // isActivated: true,
-        // email: dto.email,
-        // phone: dto.phone,
-      },
+    const identity = await this.identityRep.findOne({
+      relationLoadStrategy: 'join',
+      relations: { user: true },
+      where: { contact: dto.contact },
     });
-    if (!user) {
+    if (!identity) {
       throw new BadRequestException();
     }
-    const isPassEquals = await compare(dto.password, user.password);
+    const isPassEquals = await compare(dto.password, identity.user.password);
     if (!isPassEquals) {
       throw new BadRequestException();
     }
-    const tokens = await this.jwtService.createJwtTokens(user.id);
+    const tokens = await this.jwtService.createJwtTokens(identity.user.id);
     setCookieRefreshToken(res, tokens.refreshToken);
     return {
       accessToken: tokens.accessToken,
